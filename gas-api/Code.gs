@@ -74,24 +74,8 @@ function doPost(e) {
 
     const action = data.action;
 
-    // File Upload handling
-    let planUrl = data.planUrl || '';
-    if (data.fileData && data.fileName && data.mimeType) {
-      try {
-        const decodedFile = Utilities.base64Decode(data.fileData);
-        const blob = Utilities.newBlob(decodedFile, data.mimeType, data.fileName);
-        const folder = DriveApp.getFolderById("1qbCKw09scehqCJlNhHLMs6XqCLl6p8IB");
-        
-        const file = folder.createFile(blob);
-        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-        planUrl = file.getUrl();
-      } catch (err) {
-        planUrl = "Upload Failed: " + err.toString();
-      }
-    }
-
     if (action === 'submit_plan') {
-      // 1. ครูส่งแผนการสอน (สร้างเรคคอร์ดใหม่ สถานะ "รอรับการนิเทศ")
+      // 1. ครูส่งคำขอรับการประเมิน (สร้างเรคคอร์ดใหม่ สถานะ "รอรับการนิเทศ")
       const row = [
         'SUP' + new Date().getTime().toString().substr(-6),
         new Date().toISOString(),
@@ -105,29 +89,13 @@ function doPost(e) {
         '-', // Rating_Level
         '', // Strengths
         '', // Suggestions
-        planUrl // Plan_URL
+        '' // Plan_URL (removed)
       ];
       sheet.appendRow(row);
-      return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'ส่งแผนการสอนเรียบร้อยแล้ว' })).setMimeType(ContentService.MimeType.JSON);
+      return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'ส่งคำขอรับการนิเทศเรียบร้อยแล้ว' })).setMimeType(ContentService.MimeType.JSON);
       
     } else if (action === 'evaluate') {
-      // 2. กรรมการประเมินแผน (อัปเดตเรคคอร์ดเดิม สถานะ "เสร็จสิ้น")
-      const targetId = data.supervisionId;
-      if (!targetId) throw new Error("Missing supervisionId");
-
-      // หาระยะบรรทัดที่มี Supervision_ID ตรงกัน
-      const sheetData = sheet.getDataRange().getValues();
-      let rowIndex = -1;
-      for (let i = 1; i < sheetData.length; i++) {
-        if (sheetData[i][0] === targetId) {
-          rowIndex = i + 1; // getValues is 0-indexed, but getRange is 1-indexed
-          break;
-        }
-      }
-
-      if (rowIndex === -1) throw new Error("ไม่พบรหัสการนิเทศที่ต้องการประเมิน");
-
-      // 100-point scale Rating Level
+      // 2. กรรมการประเมิน (สร้างเรคคอร์ดใหม่ สถานะ "เสร็จสิ้น" แทนที่จะทับบรรทัดเดิม เพื่อให้กรรมการหลายคนประเมินได้)
       let rating = 'ปรับปรุง';
       const finalScore = data.percentageScore || data.totalScore || 0;
       
@@ -136,25 +104,22 @@ function doPost(e) {
       else if (finalScore >= 60) rating = 'ดี';
       else if (finalScore >= 50) rating = 'พอใช้';
 
-      // อัปเดตข้อมูล (คอลัมน์ D=Supervisor_Name, H=Status, I=Total_Score, J=Rating, K=Strengths, L=Suggestions)
-      // Array index in setValues is [row][col]
-      // Supervisor_Name (Col 4)
-      sheet.getRange(rowIndex, 4).setValue(data.supervisorName || 'ไม่ระบุ');
-      // Status (Col 8)
-      sheet.getRange(rowIndex, 8).setValue('เสร็จสิ้น');
-      // Total_Score (Col 9)
-      sheet.getRange(rowIndex, 9).setValue(finalScore);
-      // Rating_Level (Col 10)
-      sheet.getRange(rowIndex, 10).setValue(rating);
-      // Strengths (Col 11)
-      sheet.getRange(rowIndex, 11).setValue(data.strengths || '');
-      // Suggestions (Col 12)
-      sheet.getRange(rowIndex, 12).setValue(data.suggestions || '');
-      
-      // ถ้ากรรมการมีการอัปโหลดไฟล์ใหม่มาทับ ให้เปลี่ยน URL ด้วย (Col 13)
-      if (planUrl) {
-        sheet.getRange(rowIndex, 13).setValue(planUrl);
-      }
+      const row = [
+        'SUP' + new Date().getTime().toString().substr(-6),
+        new Date().toISOString(),
+        data.teacherName || 'ไม่ระบุ',
+        data.supervisorName || 'ไม่ระบุ',
+        data.subject || 'ไม่ระบุ',
+        '',
+        '',
+        'เสร็จสิ้น',
+        finalScore,
+        rating,
+        data.strengths || '',
+        data.suggestions || '',
+        ''
+      ];
+      sheet.appendRow(row);
 
       return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'ประเมินเรียบร้อยแล้ว' })).setMimeType(ContentService.MimeType.JSON);
     } else {

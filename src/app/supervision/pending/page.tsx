@@ -20,7 +20,23 @@ export default function PendingSupervisionPage() {
         const allRecords = response.data.supervisionRecords || [];
         
         // Filter only pending records
-        const pending = allRecords.filter((r: SupervisionRecord) => r.Status === 'รอรับการนิเทศ');
+        let pending = allRecords.filter((r: SupervisionRecord) => r.Status === 'รอรับการนิเทศ');
+        
+        // Find all evaluations completed by the current user
+        const myEvaluations = allRecords.filter(
+          (r: SupervisionRecord) => r.Status === "เสร็จสิ้น" && r.Supervisor_Name === user?.Name
+        );
+
+        // Filter out pending items if the current user has already evaluated that specific teacher+subject
+        if (user && !user.Role.includes('Teacher') && !user.Role.includes('ครู')) {
+          pending = pending.filter((p: SupervisionRecord) => {
+            const alreadyEvaluated = myEvaluations.some(
+              (e: SupervisionRecord) => e.Teacher_Name === p.Teacher_Name && e.Subject_Name === p.Subject_Name
+            );
+            return !alreadyEvaluated;
+          });
+        }
+
         setRecords(pending.reverse()); // Show newest first
       } catch (error) {
         console.error("Failed to load pending plans", error);
