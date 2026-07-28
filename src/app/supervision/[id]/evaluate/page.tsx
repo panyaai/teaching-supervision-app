@@ -50,9 +50,11 @@ export default function EvaluatePage() {
 
       const response = await fetch(GAS_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
         body: JSON.stringify(payload),
-        mode: 'no-cors' // Use no-cors for GAS cross-origin POST without preflight issues
+        mode: 'no-cors'
       });
       
       alert("บันทึกข้อมูลผลการนิเทศเรียบร้อยแล้ว");
