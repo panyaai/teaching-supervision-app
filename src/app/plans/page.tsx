@@ -7,24 +7,35 @@ import { FileText, Plus, Search, Eye, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { fetchGASData, SupervisionRecord } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
 export default function PlansPage() {
   const [plans, setPlans] = useState<SupervisionRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     async function loadData() {
       try {
         const response = await fetchGASData();
-        setPlans(response.data.supervisionRecords || []);
+        let fetchedRecords = response.data.supervisionRecords || [];
+        
+        const isTeacher = user?.Role.toLowerCase().includes('teacher') || user?.Role.includes('ครู');
+        if (isTeacher && user) {
+          fetchedRecords = fetchedRecords.filter((r: SupervisionRecord) => r.Teacher_Name === user.Name);
+        }
+
+        setPlans(fetchedRecords);
       } catch (error) {
         console.error("Failed to load plans", error);
       } finally {
         setLoading(false);
       }
     }
-    loadData();
-  }, []);
+    if (user) {
+      loadData();
+    }
+  }, [user]);
 
   return (
     <div className="space-y-6">
@@ -36,10 +47,13 @@ export default function PlansPage() {
           </h1>
           <p className="text-gray-500 mt-1">รายการผลการนิเทศการสอนทั้งหมด (ดึงข้อมูลจาก Google Sheets)</p>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="w-4 h-4 mr-2" />
-          สร้างแบบประเมินใหม่
-        </Button>
+        
+        {user && !(user?.Role.toLowerCase().includes('teacher') || user?.Role.includes('ครู')) && (
+          <Button className="bg-blue-600 hover:bg-blue-700">
+            <Plus className="w-4 h-4 mr-2" />
+            สร้างแบบประเมินใหม่
+          </Button>
+        )}
       </div>
 
       <Card>

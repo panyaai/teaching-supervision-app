@@ -5,15 +5,27 @@ import { LayoutDashboard, FileText, ClipboardCheck, Users, Settings, LogOut } fr
 import { useAuth } from '@/context/AuthContext';
 
 export default function Sidebar() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   
-  const menuItems = [
-    { icon: LayoutDashboard, label: 'แดชบอร์ด', href: '/dashboard' },
-    { icon: FileText, label: 'แผนการสอน', href: '/plans' },
-    { icon: ClipboardCheck, label: 'ประเมินการสอน', href: '/supervision/1/evaluate' },
-    { icon: Users, label: 'บุคลากร', href: '/users' },
-    { icon: Settings, label: 'ตั้งค่าระบบ', href: '/settings' },
-  ];
+  const isTeacher = user?.Role.toLowerCase().includes('teacher') || user?.Role.includes('ครู');
+
+  let menuItems = [];
+
+  if (isTeacher) {
+    menuItems = [
+      { icon: LayoutDashboard, label: 'แดชบอร์ดของฉัน', href: '/dashboard' },
+      { icon: FileText, label: 'ส่งแผนการสอน', href: '/teacher/upload' },
+      { icon: ClipboardCheck, label: 'ประวัติรับการนิเทศ', href: '/plans' }, // Use /plans but filter for teacher
+    ];
+  } else {
+    menuItems = [
+      { icon: LayoutDashboard, label: 'แดชบอร์ดภาพรวม', href: '/dashboard' },
+      { icon: FileText, label: 'รายการประเมิน', href: '/plans' },
+      { icon: ClipboardCheck, label: 'ประเมินการสอน', href: '/supervision/pending' },
+      { icon: Users, label: 'บุคลากร', href: '/users' },
+      { icon: Settings, label: 'ตั้งค่าระบบ', href: '/settings' },
+    ];
+  }
 
   return (
     <aside className="w-64 bg-blue-900 text-white min-h-screen flex flex-col hidden md:flex">

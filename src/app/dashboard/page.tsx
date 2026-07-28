@@ -5,17 +5,28 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Users, FileText, CheckCircle, TrendingUp, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { fetchGASData, SupervisionRecord, User } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<SupervisionRecord[]>([]);
   const [users, setUsers] = useState<User[]>([]);
 
+  const { user } = useAuth();
+  
   useEffect(() => {
     async function loadData() {
       try {
         const response = await fetchGASData();
-        setRecords(response.data.supervisionRecords || []);
+        let fetchedRecords = response.data.supervisionRecords || [];
+        
+        // Filter records for Teacher role
+        const isTeacher = user?.Role.toLowerCase().includes('teacher') || user?.Role.includes('ครู');
+        if (isTeacher && user) {
+          fetchedRecords = fetchedRecords.filter((r: SupervisionRecord) => r.Teacher_Name === user.Name);
+        }
+        
+        setRecords(fetchedRecords);
         setUsers(response.data.users || []);
       } catch (error) {
         console.error("Failed to load dashboard data", error);
@@ -23,8 +34,10 @@ export default function DashboardPage() {
         setLoading(false);
       }
     }
-    loadData();
-  }, []);
+    if (user) {
+      loadData();
+    }
+  }, [user]);
 
   if (loading) {
     return (

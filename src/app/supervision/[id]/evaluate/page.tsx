@@ -4,8 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { Save, Send, User, BookOpen, Calendar, Link as LinkIcon, AlertCircle, Loader2 } from 'lucide-react';
 import { fetchGASData, User as UserType, Category } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { useParams } from 'next/navigation';
 
 export default function EvaluatePage() {
+  const params = useParams();
+  const id = params.id as string;
+  const isEvaluateMode = id && id !== '1' && id !== 'new';
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [strengths, setStrengths] = useState('');
   const [suggestions, setSuggestions] = useState('');
@@ -20,6 +25,7 @@ export default function EvaluatePage() {
   const [teacherName, setTeacherName] = useState("");
   const [supervisorName, setSupervisorName] = useState("");
   const [subject, setSubject] = useState("");
+  const [planUrl, setPlanUrl] = useState("");
 
   const { user: currentUser } = useAuth();
 
@@ -38,6 +44,16 @@ export default function EvaluatePage() {
 
         if (currentUser && sups.some(s => s.Name === currentUser.Name)) {
           setSupervisorName(currentUser.Name);
+        }
+
+        if (isEvaluateMode) {
+          const records = response.data.supervisionRecords || [];
+          const record = records.find((r: any) => r.Supervision_ID === id);
+          if (record) {
+            setTeacherName(record.Teacher_Name);
+            setSubject(record.Subject_Name);
+            setPlanUrl(record.Plan_URL);
+          }
         }
 
         const initialScores: Record<string, string> = {};
@@ -111,6 +127,8 @@ export default function EvaluatePage() {
     }
 
     const payload = {
+      action: isEvaluateMode ? 'evaluate' : 'submit_plan',
+      supervisionId: isEvaluateMode ? id : undefined,
       teacherName: teacherName,
       supervisorName: supervisorName,
       subject: subject,
@@ -213,7 +231,8 @@ export default function EvaluatePage() {
                 </div>
               ) : (
                 <select 
-                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white font-semibold outline-none"
+                  disabled={isEvaluateMode}
+                  className={`w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 font-semibold outline-none ${isEvaluateMode ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'bg-white'}`}
                   value={teacherName}
                   onChange={(e) => {
                     setTeacherName(e.target.value);
@@ -238,26 +257,38 @@ export default function EvaluatePage() {
               <input 
                 type="text" 
                 value={subject}
+                disabled={isEvaluateMode}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white font-semibold outline-none"
+                className={`w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 font-semibold outline-none ${isEvaluateMode ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'bg-white'}`}
                 placeholder="อัปเดตอัตโนมัติตามชื่อครู"
               />
             </div>
           </div>
         </div>
 
-        <div className="mt-4">
-          <label className="block text-xs text-slate-500 mb-1">ไฟล์แนบ (แผนการสอน PDF หรือ รูปภาพ)</label>
-          <div className="relative">
-            <input 
-              type="file"
-              accept=".pdf,image/*"
-              onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
-              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
+          <div className="mt-4">
+            <label className="block text-xs text-slate-500 mb-1">ไฟล์แนบแผนการสอน</label>
+            {isEvaluateMode && planUrl && !planUrl.includes("Upload Failed") ? (
+              <a 
+                href={planUrl} 
+                target="_blank" 
+                rel="noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium hover:bg-blue-100 transition-colors"
+              >
+                <LinkIcon className="w-4 h-4 mr-2" /> เปิดดูไฟล์แผนการสอนที่ครูแนบมา
+              </a>
+            ) : (
+              <div className="relative">
+                <input 
+                  type="file"
+                  accept=".pdf,image/*"
+                  onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+              </div>
+            )}
+            {file && <p className="text-xs text-green-600 mt-1">✓ เลือกไฟล์แล้ว: {file.name}</p>}
           </div>
-          {file && <p className="text-xs text-green-600 mt-1">✓ เลือกไฟล์แล้ว: {file.name}</p>}
-        </div>
       </div>
 
       <div className="p-6">
