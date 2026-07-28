@@ -16,10 +16,11 @@ export default function EvaluatePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   
+  const [file, setFile] = useState<File | null>(null);
   const [teacherName, setTeacherName] = useState("");
   const [supervisorName, setSupervisorName] = useState("");
   const [subject, setSubject] = useState("");
-  
+
   const { user: currentUser } = useAuth();
 
   useEffect(() => {
@@ -35,12 +36,10 @@ export default function EvaluatePage() {
         setSupervisors(sups);
         setCategories(cats);
 
-        // Pre-select supervisor if current user is one of them
         if (currentUser && sups.some(s => s.Name === currentUser.Name)) {
           setSupervisorName(currentUser.Name);
         }
 
-        // Initialize scores state based on dynamic categories
         const initialScores: Record<string, string> = {};
         cats.forEach(c => {
           initialScores[c.Category_ID] = '';
@@ -60,6 +59,19 @@ export default function EvaluatePage() {
     setScores(prev => ({ ...prev, [categoryId]: value }));
   };
 
+  const getBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        let encoded = reader.result?.toString() || '';
+        const base64String = encoded.replace(/^data:(.*,)?/, '');
+        resolve(base64String);
+      };
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const handleSubmit = async () => {
     if (!teacherName) {
       alert("กรุณาเลือกผู้รับการนิเทศ (ครูผู้สอน)");
@@ -77,15 +89,39 @@ export default function EvaluatePage() {
     setIsSubmitting(true);
     let totalScore = 0;
     Object.values(scores).forEach(s => totalScore += parseInt(s));
+    
+    // Calculate 100-point scale percentage
+    const maxPossibleScore = Object.keys(scores).length * 5;
+    const percentageScore = maxPossibleScore > 0 ? Math.round((totalScore / maxPossibleScore) * 100) : 0;
+
+    let fileData = '';
+    let fileName = '';
+    let mimeType = '';
+    if (file) {
+      try {
+        fileData = await getBase64(file);
+        fileName = file.name;
+        mimeType = file.type;
+      } catch (e) {
+        console.error("File reading failed", e);
+        alert("ไม่สามารถอ่านไฟล์ได้ กรุณาลองใหม่อีกครั้ง");
+        setIsSubmitting(false);
+        return;
+      }
+    }
 
     const payload = {
       teacherName: teacherName,
       supervisorName: supervisorName,
       subject: subject,
-      totalScore,
+      totalScore, // raw score (optional)
+      percentageScore, // 100-point scale
       strengths,
       suggestions,
-      planUrl: ''
+      planUrl: '',
+      fileData,
+      fileName,
+      mimeType
     };
 
     try {
@@ -208,6 +244,19 @@ export default function EvaluatePage() {
               />
             </div>
           </div>
+        </div>
+
+        <div className="mt-4">
+          <label className="block text-xs text-slate-500 mb-1">ไฟล์แนบ (แผนการสอน PDF หรือ รูปภาพ)</label>
+          <div className="relative">
+            <input 
+              type="file"
+              accept=".pdf,image/*"
+              onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
+          </div>
+          {file && <p className="text-xs text-green-600 mt-1">✓ เลือกไฟล์แล้ว: {file.name}</p>}
         </div>
       </div>
 

@@ -72,11 +72,38 @@ function doPost(e) {
       sheet.appendRow(['Supervision_ID', 'Date_Time', 'Teacher_Name', 'Supervisor_Name', 'Subject_Name', 'Subject_Code', 'Grade_Level', 'Status', 'Total_Score', 'Rating_Level', 'Strengths', 'Suggestions', 'Plan_URL']);
     }
 
+    // 100-point scale Rating Level
     let rating = 'ปรับปรุง';
-    if (data.totalScore >= 18) rating = 'ดีเยี่ยม';
-    else if (data.totalScore >= 14) rating = 'ดีมาก';
-    else if (data.totalScore >= 10) rating = 'ดี';
-    else if (data.totalScore >= 6) rating = 'พอใช้';
+    const finalScore = data.percentageScore || data.totalScore || 0;
+    
+    if (finalScore >= 80) rating = 'ดีเยี่ยม';
+    else if (finalScore >= 70) rating = 'ดีมาก';
+    else if (finalScore >= 60) rating = 'ดี';
+    else if (finalScore >= 50) rating = 'พอใช้';
+
+    // File Upload handling
+    let planUrl = data.planUrl || '';
+    if (data.fileData && data.fileName && data.mimeType) {
+      try {
+        const decodedFile = Utilities.base64Decode(data.fileData);
+        const blob = Utilities.newBlob(decodedFile, data.mimeType, data.fileName);
+        const folderName = "Teaching_Supervision_Plans";
+        
+        let folders = DriveApp.getFoldersByName(folderName);
+        let folder;
+        if (folders.hasNext()) {
+          folder = folders.next();
+        } else {
+          folder = DriveApp.createFolder(folderName);
+        }
+        
+        const file = folder.createFile(blob);
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        planUrl = file.getUrl();
+      } catch (err) {
+        planUrl = "Upload Failed: " + err.toString();
+      }
+    }
 
     const row = [
       'SUP' + new Date().getTime().toString().substr(-6),
@@ -87,11 +114,11 @@ function doPost(e) {
       '',
       '',
       'เสร็จสิ้น',
-      data.totalScore,
+      finalScore,
       rating,
       data.strengths || '',
       data.suggestions || '',
-      data.planUrl || ''
+      planUrl
     ];
 
     sheet.appendRow(row);
