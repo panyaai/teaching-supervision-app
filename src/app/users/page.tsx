@@ -3,16 +3,28 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Users as UsersIcon, UserPlus, Search, Edit, Trash2 } from "lucide-react";
+import { Users as UsersIcon, UserPlus, Search, Edit, Trash2, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
+import { fetchGASData, User } from "@/lib/api";
 
 export default function UsersPage() {
-  const users = [
-    { id: 1, name: "ดร. สมเกียรติ ยอดเยี่ยม", role: "ผู้ดูแลระบบ (Admin)", email: "admin@school.ac.th" },
-    { id: 2, name: "สมหญิง รักเรียน", role: "ผู้นิเทศ", email: "supervisor1@school.ac.th" },
-    { id: 3, name: "ครูสมปอง ทองคำ", role: "ครูผู้สอน", email: "sompong@school.ac.th" },
-    { id: 4, name: "ครูใจดี มีสุข", role: "ครูผู้สอน", email: "jaidee@school.ac.th" },
-  ];
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const response = await fetchGASData();
+        setUsers(response.data.users || []);
+      } catch (error) {
+        console.error("Failed to load users", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -22,18 +34,18 @@ export default function UsersPage() {
             <UsersIcon className="w-8 h-8 text-blue-600" />
             จัดการบุคลากร (Users)
           </h1>
-          <p className="text-gray-500 mt-1">เพิ่ม แก้ไข หรือลบข้อมูลบุคลากรในระบบ</p>
+          <p className="text-gray-500 mt-1">เพิ่ม แก้ไข หรือลบข้อมูลบุคลากร (ซิงก์จาก Google Sheets)</p>
         </div>
         <Button className="bg-blue-600 hover:bg-blue-700">
           <UserPlus className="w-4 h-4 mr-2" />
-          เพิ่มบุคลากรใหม่
+          อัปเดตข้อมูลจากชีต
         </Button>
       </div>
 
       <Card>
         <CardHeader className="pb-3">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <CardTitle className="text-lg">รายชื่อบุคลากรทั้งหมด</CardTitle>
+            <CardTitle className="text-lg">รายชื่อบุคลากรทั้งหมด ({users.length} คน)</CardTitle>
             <div className="relative w-full sm:w-72">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <Input placeholder="ค้นหาชื่อ, อีเมล..." className="pl-9" />
@@ -41,44 +53,53 @@ export default function UsersPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-slate-50">
-                  <TableHead>ชื่อ - นามสกุล</TableHead>
-                  <TableHead>สิทธิ์การใช้งาน (Role)</TableHead>
-                  <TableHead>อีเมล</TableHead>
-                  <TableHead className="text-right">จัดการ</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium text-slate-800">{user.name}</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        user.role.includes('Admin') ? 'bg-purple-100 text-purple-700' :
-                        user.role.includes('ผู้นิเทศ') ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'
-                      }`}>
-                        {user.role}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-slate-500">{user.email}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2">
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-800 hover:bg-red-50 px-2">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center h-48">
+              <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-4" />
+              <p className="text-gray-500 font-medium">กำลังโหลดรายชื่อ...</p>
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50">
+                    <TableHead>รหัส</TableHead>
+                    <TableHead>ชื่อ - นามสกุล</TableHead>
+                    <TableHead>ตำแหน่ง</TableHead>
+                    <TableHead>กลุ่มสาระฯ</TableHead>
+                    <TableHead>อีเมล</TableHead>
+                    <TableHead>สิทธิ์ (Role)</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {users.length > 0 ? users.map((user, i) => (
+                    <TableRow key={i}>
+                      <TableCell className="font-medium text-slate-500">{user.User_ID}</TableCell>
+                      <TableCell className="font-bold text-slate-800">{user.Name}</TableCell>
+                      <TableCell>{user.Position}</TableCell>
+                      <TableCell>{user.Subject_Group}</TableCell>
+                      <TableCell className="text-blue-600">{user.Email}</TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          String(user.Role).toLowerCase().includes('admin') ? 'bg-purple-100 text-purple-700' :
+                          String(user.Role).toLowerCase().includes('supervisor') ? 'bg-blue-100 text-blue-700' : 
+                          'bg-slate-100 text-slate-700'
+                        }`}>
+                          {user.Role}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  )) : (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                        ไม่พบข้อมูลบุคลากรใน Google Sheets
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Save, Send, User, BookOpen, Calendar, Link as LinkIcon, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Save, Send, User, BookOpen, Calendar, Link as LinkIcon, AlertCircle, Loader2 } from 'lucide-react';
+import { fetchGASData, User as UserType } from "@/lib/api";
 
 export default function EvaluatePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -14,12 +15,36 @@ export default function EvaluatePage() {
     assessment: ''
   });
 
+  const [teachers, setTeachers] = useState<UserType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [teacherName, setTeacherName] = useState("");
+  const [subject, setSubject] = useState("");
+  const supervisorName = "ดร. สมเกียรติ ยอดเยี่ยม";
+
+  useEffect(() => {
+    async function loadUsers() {
+      try {
+        const response = await fetchGASData();
+        const users = response.data.users || [];
+        setTeachers(users.filter((u: UserType) => String(u.Role).toLowerCase().includes('teacher') || u.Role.includes('ครู')));
+      } catch (error) {
+        console.error("Failed to load teachers", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadUsers();
+  }, []);
+
   const handleScoreChange = (category: string, value: string) => {
     setScores(prev => ({ ...prev, [category]: value }));
   };
 
   const handleSubmit = async () => {
-    // Add validation
+    if (!teacherName) {
+      alert("กรุณาเลือกผู้รับการนิเทศ");
+      return;
+    }
     if (Object.values(scores).some(v => !v)) {
       alert("กรุณาให้คะแนนให้ครบทุกหมวด");
       return;
@@ -30,17 +55,16 @@ export default function EvaluatePage() {
     Object.values(scores).forEach(s => totalScore += parseInt(s));
 
     const payload = {
-      teacherName: 'ครูสมปอง ทองคำ',
-      supervisorName: 'สมหญิง รักเรียน',
-      subject: 'คณิตศาสตร์พื้นฐาน (ค31101)',
+      teacherName: teacherName,
+      supervisorName: supervisorName,
+      subject: subject,
       totalScore,
       strengths,
       suggestions,
-      planUrl: 'https://drive.google.com/file/d/mock123'
+      planUrl: ''
     };
 
     try {
-      // TODO: Replace with actual Google Apps Script Web App URL after deployment
       const GAS_URL = process.env.NEXT_PUBLIC_GAS_URL || ''; 
       if (!GAS_URL) {
         alert("กรุณาตั้งค่า NEXT_PUBLIC_GAS_URL ก่อนส่งข้อมูล");
@@ -85,47 +109,59 @@ export default function EvaluatePage() {
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden font-sans">
       
-      {/* Header Section */}
       <div className="bg-blue-900 p-6 text-white">
         <h1 className="text-2xl font-bold mb-2">แบบฟอร์มบันทึกผลการนิเทศการสอน</h1>
         <p className="text-blue-100 text-sm">ระบบนิเทศการสอนออนไลน์ (Instructional Supervision System)</p>
       </div>
 
-      {/* Info Section */}
       <div className="p-6 border-b border-slate-100 bg-slate-50">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center text-slate-700">
-            <User className="w-5 h-5 mr-3 text-blue-600" />
-            <div>
-              <span className="block text-xs text-slate-500">ผู้รับการนิเทศ</span>
-              <span className="font-semibold">ครูสมปอง ทองคำ</span>
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">ผู้รับการนิเทศ (ครูผู้สอน)</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-blue-600" />
+              </div>
+              {loading ? (
+                <div className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-slate-500 bg-white">
+                  <Loader2 className="w-4 h-4 animate-spin inline-block mr-2" /> กำลังโหลด...
+                </div>
+              ) : (
+                <select 
+                  className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white font-semibold"
+                  value={teacherName}
+                  onChange={(e) => {
+                    setTeacherName(e.target.value);
+                    const t = teachers.find(t => t.Name === e.target.value);
+                    if (t) setSubject(t.Subject_Group);
+                  }}
+                >
+                  <option value="">-- เลือกครูผู้สอน --</option>
+                  {teachers.map((t, i) => (
+                    <option key={i} value={t.Name}>{t.Name}</option>
+                  ))}
+                </select>
+              )}
             </div>
           </div>
-          <div className="flex items-center text-slate-700">
-            <BookOpen className="w-5 h-5 mr-3 text-blue-600" />
-            <div>
-              <span className="block text-xs text-slate-500">วิชาที่สอน</span>
-              <span className="font-semibold">คณิตศาสตร์พื้นฐาน (ค31101) ม.4</span>
-            </div>
-          </div>
-          <div className="flex items-center text-slate-700">
-            <Calendar className="w-5 h-5 mr-3 text-blue-600" />
-            <div>
-              <span className="block text-xs text-slate-500">วันที่ประเมิน</span>
-              <span className="font-semibold">15 มิถุนายน 2024</span>
-            </div>
-          </div>
-          <div className="flex items-center text-slate-700">
-            <LinkIcon className="w-5 h-5 mr-3 text-blue-600" />
-            <div>
-              <span className="block text-xs text-slate-500">เอกสารประกอบ</span>
-              <a href="#" className="font-semibold text-blue-600 hover:underline">ดูแผนการสอน (PDF)</a>
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">กลุ่มสาระการเรียนรู้ / รายวิชา</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <BookOpen className="h-5 w-5 text-blue-600" />
+              </div>
+              <input 
+                type="text" 
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white font-semibold"
+                placeholder="อัปเดตอัตโนมัติตามชื่อครู"
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Evaluation Section */}
       <div className="p-6">
         <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center">
           <AlertCircle className="w-5 h-5 mr-2 text-blue-600" />
@@ -158,7 +194,6 @@ export default function EvaluatePage() {
           ))}
         </div>
 
-        {/* Feedback Section */}
         <div className="mt-8 space-y-6">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">จุดเด่นของการสอน (Strengths)</label>
@@ -183,7 +218,6 @@ export default function EvaluatePage() {
         </div>
       </div>
 
-      {/* Footer Actions */}
       <div className="bg-slate-50 p-6 border-t border-slate-100 flex flex-col sm:flex-row justify-end items-center gap-4">
         <button 
           onClick={handleSubmit}
