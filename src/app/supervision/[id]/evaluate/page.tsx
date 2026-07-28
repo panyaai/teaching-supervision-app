@@ -11,12 +11,13 @@ export default function EvaluatePage() {
   const [scores, setScores] = useState<Record<string, string>>({});
 
   const [teachers, setTeachers] = useState<UserType[]>([]);
+  const [supervisors, setSupervisors] = useState<UserType[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [teacherName, setTeacherName] = useState("");
+  const [supervisorName, setSupervisorName] = useState("");
   const [subject, setSubject] = useState("");
-  const supervisorName = "ดร. สมเกียรติ ยอดเยี่ยม";
 
   useEffect(() => {
     async function loadData() {
@@ -26,6 +27,7 @@ export default function EvaluatePage() {
         const cats = response.data.categories || [];
         
         setTeachers(users.filter((u: UserType) => String(u.Role).toLowerCase().includes('teacher') || u.Role.includes('ครู')));
+        setSupervisors(users.filter((u: UserType) => String(u.Role).toLowerCase().includes('admin') || String(u.Role).toLowerCase().includes('supervisor') || u.Role.includes('บริหาร') || u.Role.includes('ผู้นิเทศ')));
         setCategories(cats);
 
         // Initialize scores state based on dynamic categories
@@ -50,7 +52,11 @@ export default function EvaluatePage() {
 
   const handleSubmit = async () => {
     if (!teacherName) {
-      alert("กรุณาเลือกผู้รับการนิเทศ");
+      alert("กรุณาเลือกผู้รับการนิเทศ (ครูผู้สอน)");
+      return;
+    }
+    if (!supervisorName) {
+      alert("กรุณาเลือกผู้ประเมิน (ผู้นิเทศ)");
       return;
     }
     if (Object.values(scores).some(v => !v)) {
@@ -116,6 +122,33 @@ export default function EvaluatePage() {
       </div>
 
       <div className="p-6 border-b border-slate-100 bg-slate-50">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-xs text-slate-500 mb-1">ผู้ประเมิน (ผู้นิเทศ)</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-purple-600" />
+              </div>
+              {loading ? (
+                <div className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg text-slate-500 bg-white">
+                  <Loader2 className="w-4 h-4 animate-spin inline-block mr-2" /> กำลังโหลด...
+                </div>
+              ) : (
+                <select 
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500 bg-white font-semibold outline-none"
+                  value={supervisorName}
+                  onChange={(e) => setSupervisorName(e.target.value)}
+                >
+                  <option value="">-- เลือกผู้ประเมิน --</option>
+                  {supervisors.map((s, i) => (
+                    <option key={i} value={s.Name}>{s.Name}</option>
+                  ))}
+                </select>
+              )}
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs text-slate-500 mb-1">ผู้รับการนิเทศ (ครูผู้สอน)</label>
