@@ -1,7 +1,12 @@
+"use client";
+
 import Link from 'next/link';
 import { LayoutDashboard, FileText, ClipboardCheck, Users, Settings, LogOut } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Sidebar() {
+  const { logout } = useAuth();
+  
   const menuItems = [
     { icon: LayoutDashboard, label: 'แดชบอร์ด', href: '/dashboard' },
     { icon: FileText, label: 'แผนการสอน', href: '/plans' },
@@ -34,7 +39,10 @@ export default function Sidebar() {
         })}
       </nav>
       <div className="p-4 border-t border-blue-800">
-        <button className="flex items-center gap-3 px-4 py-2 w-full text-left text-red-300 hover:bg-blue-800 rounded transition-colors">
+        <button 
+          onClick={logout}
+          className="flex items-center gap-3 px-4 py-2 w-full text-left text-red-300 hover:bg-blue-800 rounded transition-colors"
+        >
           <LogOut className="w-5 h-5" />
           <span>ออกจากระบบ</span>
         </button>

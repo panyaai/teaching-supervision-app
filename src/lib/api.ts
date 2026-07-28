@@ -38,9 +38,17 @@ export interface GASResponse {
 }
 
 export async function fetchGASData(): Promise<GASResponse> {
-  const GAS_URL = process.env.NEXT_PUBLIC_GAS_URL;
+  let GAS_URL = process.env.NEXT_PUBLIC_GAS_URL;
+  
+  if (typeof window !== "undefined") {
+    const savedUrl = localStorage.getItem("gasUrl");
+    if (savedUrl) {
+      GAS_URL = savedUrl;
+    }
+  }
+
   if (!GAS_URL) {
-    throw new Error("NEXT_PUBLIC_GAS_URL is not defined in .env.local");
+    throw new Error("GAS_URL is not defined in .env.local or Settings");
   }
 
   try {

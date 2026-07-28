@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Send, User, BookOpen, Calendar, Link as LinkIcon, AlertCircle, Loader2 } from 'lucide-react';
 import { fetchGASData, User as UserType, Category } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
 export default function EvaluatePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,6 +19,8 @@ export default function EvaluatePage() {
   const [teacherName, setTeacherName] = useState("");
   const [supervisorName, setSupervisorName] = useState("");
   const [subject, setSubject] = useState("");
+  
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
     async function loadData() {
@@ -27,8 +30,15 @@ export default function EvaluatePage() {
         const cats = response.data.categories || [];
         
         setTeachers(users.filter((u: UserType) => String(u.Role).toLowerCase().includes('teacher') || u.Role.includes('ครู')));
-        setSupervisors(users.filter((u: UserType) => String(u.Role).toLowerCase().includes('admin') || String(u.Role).toLowerCase().includes('supervisor') || u.Role.includes('บริหาร') || u.Role.includes('ผู้นิเทศ')));
+        
+        const sups = users.filter((u: UserType) => String(u.Role).toLowerCase().includes('admin') || String(u.Role).toLowerCase().includes('supervisor') || u.Role.includes('บริหาร') || u.Role.includes('ผู้นิเทศ'));
+        setSupervisors(sups);
         setCategories(cats);
+
+        // Pre-select supervisor if current user is one of them
+        if (currentUser && sups.some(s => s.Name === currentUser.Name)) {
+          setSupervisorName(currentUser.Name);
+        }
 
         // Initialize scores state based on dynamic categories
         const initialScores: Record<string, string> = {};
@@ -44,7 +54,7 @@ export default function EvaluatePage() {
       }
     }
     loadData();
-  }, []);
+  }, [currentUser]);
 
   const handleScoreChange = (categoryId: string, value: string) => {
     setScores(prev => ({ ...prev, [categoryId]: value }));
@@ -79,9 +89,14 @@ export default function EvaluatePage() {
     };
 
     try {
-      const GAS_URL = process.env.NEXT_PUBLIC_GAS_URL || ''; 
+      let GAS_URL = process.env.NEXT_PUBLIC_GAS_URL || ''; 
+      if (typeof window !== "undefined") {
+        const savedUrl = localStorage.getItem("gasUrl");
+        if (savedUrl) GAS_URL = savedUrl;
+      }
+      
       if (!GAS_URL) {
-        alert("กรุณาตั้งค่า NEXT_PUBLIC_GAS_URL ก่อนส่งข้อมูล");
+        alert("กรุณาตั้งค่า Google Apps Script URL ในหน้าตั้งค่าระบบก่อนส่งข้อมูล");
         setIsSubmitting(false);
         return;
       }

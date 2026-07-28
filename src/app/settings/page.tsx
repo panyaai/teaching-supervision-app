@@ -1,12 +1,56 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, Save, Database, Bell, Shield } from "lucide-react";
+import { Settings as SettingsIcon, Save, Database, Bell, Shield, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function SettingsPage() {
+  const [gasUrl, setGasUrl] = useState("");
+  const [year, setYear] = useState("2567");
+  const [term, setTerm] = useState("1");
+  const [isSaving, setIsSaving] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // Load saved settings from local storage
+    const savedGasUrl = localStorage.getItem("gasUrl") || process.env.NEXT_PUBLIC_GAS_URL || "";
+    const savedYear = localStorage.getItem("academicYear") || "2567";
+    const savedTerm = localStorage.getItem("academicTerm") || "1";
+
+    setGasUrl(savedGasUrl);
+    setYear(savedYear);
+    setTerm(savedTerm);
+    setMounted(true);
+  }, []);
+
+  const handleSaveGAS = () => {
+    setIsSaving(true);
+    localStorage.setItem("gasUrl", gasUrl);
+    setTimeout(() => {
+      setIsSaving(false);
+      alert("บันทึก Google Apps Script URL เรียบร้อยแล้ว (การตั้งค่านี้จะเก็บไว้ในเครื่องของคุณ)");
+    }, 500);
+  };
+
+  const handleSaveAcademic = () => {
+    setIsSaving(true);
+    localStorage.setItem("academicYear", year);
+    localStorage.setItem("academicTerm", term);
+    
+    // Dispatch a custom event to update header automatically if we want
+    window.dispatchEvent(new Event('academicSettingsChanged'));
+    
+    setTimeout(() => {
+      setIsSaving(false);
+      alert("บันทึกปีการศึกษาเรียบร้อยแล้ว");
+    }, 500);
+  };
+
+  if (!mounted) return null;
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div>
@@ -39,23 +83,23 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>เชื่อมต่อ Google Sheets API</CardTitle>
-              <CardDescription>ตั้งค่า Web App URL ที่ได้จาก Google Apps Script เพื่อให้ระบบส่งข้อมูลไปบันทึกได้</CardDescription>
+              <CardDescription>ตั้งค่า Web App URL ที่ได้จาก Google Apps Script (หากคุณสร้าง Deploy ใหม่แล้วได้ลิงก์ใหม่ ให้นำมาเปลี่ยนที่นี่)</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="gas-url">Google Apps Script Web App URL</Label>
                 <Input 
                   id="gas-url" 
-                  defaultValue={process.env.NEXT_PUBLIC_GAS_URL}
+                  value={gasUrl}
+                  onChange={(e) => setGasUrl(e.target.value)}
                   placeholder="https://script.google.com/macros/s/.../exec" 
                 />
-                <p className="text-xs text-gray-500 mt-1">URL ปัจจุบันถูกดึงมาจาก .env.local โดยอัตโนมัติ</p>
               </div>
 
               <div className="pt-4 flex justify-end">
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  <Save className="w-4 h-4 mr-2" />
-                  บันทึกการตั้งค่า
+                <Button onClick={handleSaveGAS} disabled={isSaving} className="bg-blue-600 hover:bg-blue-700">
+                  {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                  บันทึก URL
                 </Button>
               </div>
             </CardContent>
@@ -64,22 +108,22 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>ตั้งค่าปีการศึกษาปัจจุบัน</CardTitle>
-              <CardDescription>ข้อมูลนี้จะแสดงที่แถบด้านบนของทุกหน้า และใช้สำหรับบันทึกการประเมิน</CardDescription>
+              <CardDescription>ข้อมูลนี้จะแสดงที่แถบด้านบนของทุกหน้า และใช้เป็นข้อมูลอ้างอิง</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="year">ปีการศึกษา</Label>
-                  <Input id="year" defaultValue="2567" />
+                  <Input id="year" value={year} onChange={(e) => setYear(e.target.value)} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="term">ภาคเรียนที่</Label>
-                  <Input id="term" defaultValue="1" />
+                  <Input id="term" value={term} onChange={(e) => setTerm(e.target.value)} />
                 </div>
               </div>
               <div className="pt-4 flex justify-end">
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  <Save className="w-4 h-4 mr-2" />
+                <Button onClick={handleSaveAcademic} disabled={isSaving} className="bg-blue-600 hover:bg-blue-700">
+                  {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                   บันทึกปีการศึกษา
                 </Button>
               </div>

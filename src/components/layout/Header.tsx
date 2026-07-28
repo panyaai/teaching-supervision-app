@@ -1,13 +1,18 @@
+"use client";
+
 import { Bell, UserCircle, Menu } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Header() {
+  const { user } = useAuth();
+
   return (
     <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6">
       <div className="flex items-center md:hidden">
         <button className="text-gray-500 hover:text-gray-700">
           <Menu className="w-6 h-6" />
         </button>
-        <span className="ml-4 font-bold text-blue-900">ระบบนิเทศการสอน</span>
+        <span className="ml-4 font-bold text-blue-900">ระบบนิเทศ</span>
       </div>
       
       <div className="hidden md:flex items-center text-sm text-gray-500">
@@ -22,8 +27,8 @@ export default function Header() {
         <div className="flex items-center gap-2 border-l pl-4 border-gray-200">
           <UserCircle className="w-8 h-8 text-blue-600" />
           <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-gray-700">สมหญิง รักเรียน</p>
-            <p className="text-xs text-gray-500">ผู้นิเทศ / รองผู้อำนวยการ</p>
+            <p className="text-sm font-semibold text-gray-700">{user?.Name || 'กำลังโหลด...'}</p>
+            <p className="text-xs text-gray-500">{user?.Role || '-'}</p>
           </div>
         </div>
       </div>
