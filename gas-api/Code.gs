@@ -80,15 +80,7 @@ function doPost(e) {
       try {
         const decodedFile = Utilities.base64Decode(data.fileData);
         const blob = Utilities.newBlob(decodedFile, data.mimeType, data.fileName);
-        const folderName = "Teaching_Supervision_Plans";
-        
-        let folders = DriveApp.getFoldersByName(folderName);
-        let folder;
-        if (folders.hasNext()) {
-          folder = folders.next();
-        } else {
-          folder = DriveApp.createFolder(folderName);
-        }
+        const folder = DriveApp.getFolderById("1qbCKw09scehqCJlNhHLMs6XqCLl6p8IB");
         
         const file = folder.createFile(blob);
         file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
