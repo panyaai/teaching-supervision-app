@@ -23,11 +23,17 @@ export interface SupervisionRecord {
   Plan_URL: string;
 }
 
+export interface Category {
+  Category_ID: string;
+  Title: string;
+}
+
 export interface GASResponse {
   status: string;
   data: {
     users: User[];
     supervisionRecords: SupervisionRecord[];
+    categories: Category[];
   };
 }
 
@@ -40,7 +46,6 @@ export async function fetchGASData(): Promise<GASResponse> {
   try {
     const response = await fetch(GAS_URL, {
       method: "GET",
-      // GET requests to GAS generally work with CORS automatically (they follow 302 redirects)
     });
 
     if (!response.ok) {

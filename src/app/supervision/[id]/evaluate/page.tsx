@@ -2,42 +2,50 @@
 
 import React, { useState, useEffect } from 'react';
 import { Save, Send, User, BookOpen, Calendar, Link as LinkIcon, AlertCircle, Loader2 } from 'lucide-react';
-import { fetchGASData, User as UserType } from "@/lib/api";
+import { fetchGASData, User as UserType, Category } from "@/lib/api";
 
 export default function EvaluatePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [strengths, setStrengths] = useState('');
   const [suggestions, setSuggestions] = useState('');
-  const [scores, setScores] = useState<Record<string, string>>({
-    preparation: '',
-    activity: '',
-    media: '',
-    assessment: ''
-  });
+  const [scores, setScores] = useState<Record<string, string>>({});
 
   const [teachers, setTeachers] = useState<UserType[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  
   const [teacherName, setTeacherName] = useState("");
   const [subject, setSubject] = useState("");
   const supervisorName = "ดร. สมเกียรติ ยอดเยี่ยม";
 
   useEffect(() => {
-    async function loadUsers() {
+    async function loadData() {
       try {
         const response = await fetchGASData();
         const users = response.data.users || [];
+        const cats = response.data.categories || [];
+        
         setTeachers(users.filter((u: UserType) => String(u.Role).toLowerCase().includes('teacher') || u.Role.includes('ครู')));
+        setCategories(cats);
+
+        // Initialize scores state based on dynamic categories
+        const initialScores: Record<string, string> = {};
+        cats.forEach(c => {
+          initialScores[c.Category_ID] = '';
+        });
+        setScores(initialScores);
+
       } catch (error) {
-        console.error("Failed to load teachers", error);
+        console.error("Failed to load data", error);
       } finally {
         setLoading(false);
       }
     }
-    loadUsers();
+    loadData();
   }, []);
 
-  const handleScoreChange = (category: string, value: string) => {
-    setScores(prev => ({ ...prev, [category]: value }));
+  const handleScoreChange = (categoryId: string, value: string) => {
+    setScores(prev => ({ ...prev, [categoryId]: value }));
   };
 
   const handleSubmit = async () => {
@@ -99,13 +107,6 @@ export default function EvaluatePage() {
     { value: '1', label: 'ปรับปรุง', color: 'bg-red-100 text-red-700 border-red-300' }
   ];
 
-  const categories = [
-    { id: 'preparation', title: '1. การเตรียมการสอน' },
-    { id: 'activity', title: '2. การจัดกิจกรรมการเรียนรู้' },
-    { id: 'media', title: '3. การใช้สื่อและนวัตกรรม' },
-    { id: 'assessment', title: '4. การวัดและประเมินผล' }
-  ];
-
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden font-sans">
       
@@ -123,12 +124,12 @@ export default function EvaluatePage() {
                 <User className="h-5 w-5 text-blue-600" />
               </div>
               {loading ? (
-                <div className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-slate-500 bg-white">
+                <div className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg text-slate-500 bg-white">
                   <Loader2 className="w-4 h-4 animate-spin inline-block mr-2" /> กำลังโหลด...
                 </div>
               ) : (
                 <select 
-                  className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white font-semibold"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white font-semibold outline-none"
                   value={teacherName}
                   onChange={(e) => {
                     setTeacherName(e.target.value);
@@ -154,7 +155,7 @@ export default function EvaluatePage() {
                 type="text" 
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white font-semibold"
+                className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white font-semibold outline-none"
                 placeholder="อัปเดตอัตโนมัติตามชื่อครู"
               />
             </div>
@@ -168,31 +169,38 @@ export default function EvaluatePage() {
           เกณฑ์การให้คะแนน
         </h2>
         
-        <div className="space-y-8">
-          {categories.map((cat) => (
-            <div key={cat.id} className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors">
-              <h3 className="font-semibold text-slate-800 mb-4">{cat.title}</h3>
-              <div className="grid grid-cols-5 gap-2 sm:gap-4">
-                {scoreOptions.map((opt) => (
-                  <label key={opt.value} className={`
-                    cursor-pointer flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg border-2 transition-all text-center
-                    ${scores[cat.id] === opt.value ? opt.color : 'border-slate-100 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:border-slate-200'}
-                  `}>
-                    <input 
-                      type="radio" 
-                      name={cat.id} 
-                      value={opt.value} 
-                      className="sr-only"
-                      onChange={(e) => handleScoreChange(cat.id, e.target.value)}
-                    />
-                    <span className="font-bold text-base sm:text-lg mb-1">{opt.value}</span>
-                    <span className="text-[10px] sm:text-xs leading-tight">{opt.label}</span>
-                  </label>
-                ))}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-4" />
+            <p className="text-gray-500 font-medium">กำลังโหลดหัวข้อการประเมิน...</p>
+          </div>
+        ) : (
+          <div className="space-y-6 sm:space-y-8">
+            {categories.map((cat) => (
+              <div key={cat.Category_ID} className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors">
+                <h3 className="font-semibold text-slate-800 mb-4">{cat.Title}</h3>
+                <div className="grid grid-cols-5 gap-2 sm:gap-4">
+                  {scoreOptions.map((opt) => (
+                    <label key={opt.value} className={`
+                      cursor-pointer flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg border-2 transition-all text-center
+                      ${scores[cat.Category_ID] === opt.value ? opt.color : 'border-slate-100 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:border-slate-200'}
+                    `}>
+                      <input 
+                        type="radio" 
+                        name={cat.Category_ID} 
+                        value={opt.value} 
+                        className="sr-only"
+                        onChange={(e) => handleScoreChange(cat.Category_ID, e.target.value)}
+                      />
+                      <span className="font-bold text-base sm:text-lg mb-1">{opt.value}</span>
+                      <span className="text-[10px] sm:text-xs leading-tight">{opt.label}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <div className="mt-8 space-y-6">
           <div>
@@ -222,9 +230,9 @@ export default function EvaluatePage() {
         <button 
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="w-full sm:w-auto px-6 py-2.5 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm flex items-center justify-center transition-colors disabled:opacity-50"
+          className="w-full sm:w-auto px-6 py-4 sm:py-2.5 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm flex items-center justify-center transition-colors disabled:opacity-50 text-lg sm:text-base"
         >
-          <Send className="w-4 h-4 mr-2" />
+          <Send className="w-5 h-5 sm:w-4 sm:h-4 mr-2" />
           {isSubmitting ? 'กำลังส่งข้อมูล...' : 'ส่งผลการประเมิน'}
         </button>
       </div>

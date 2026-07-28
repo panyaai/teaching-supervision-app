@@ -5,16 +5,21 @@ function getSheetData(sheetName, headers) {
   if (!sheet) {
     sheet = ss.insertSheet(sheetName);
     sheet.appendRow(headers);
-    // Add some dummy data if it's the Users sheet
     if (sheetName === 'Users') {
       sheet.appendRow(['U001', 'ดร. สมเกียรติ ยอดเยี่ยม', 'ผู้อำนวยการ', 'บริหาร', 'admin@school.ac.th', 'Admin']);
       sheet.appendRow(['U002', 'สมหญิง รักเรียน', 'รองผู้อำนวยการ', 'บริหาร', 'supervisor1@school.ac.th', 'Supervisor']);
       sheet.appendRow(['U003', 'ครูสมปอง ทองคำ', 'ครู', 'คณิตศาสตร์', 'sompong@school.ac.th', 'Teacher']);
     }
+    if (sheetName === 'Categories') {
+      sheet.appendRow(['preparation', '1. การเตรียมการสอน']);
+      sheet.appendRow(['activity', '2. การจัดกิจกรรมการเรียนรู้']);
+      sheet.appendRow(['media', '3. การใช้สื่อและนวัตกรรม']);
+      sheet.appendRow(['assessment', '4. การวัดและประเมินผล']);
+    }
   }
 
   const data = sheet.getDataRange().getValues();
-  if (data.length <= 1) return []; // Empty or only headers
+  if (data.length <= 1) return [];
 
   const keys = data[0];
   const result = [];
@@ -35,15 +40,18 @@ function doGet(e) {
   try {
     const usersHeaders = ['User_ID', 'Name', 'Position', 'Subject_Group', 'Email', 'Role'];
     const supervisionHeaders = ['Supervision_ID', 'Date_Time', 'Teacher_Name', 'Supervisor_Name', 'Subject_Name', 'Subject_Code', 'Grade_Level', 'Status', 'Total_Score', 'Rating_Level', 'Strengths', 'Suggestions', 'Plan_URL'];
-    
+    const categoriesHeaders = ['Category_ID', 'Title'];
+
     const users = getSheetData('Users', usersHeaders);
     const supervisionRecords = getSheetData('Supervision_Records', supervisionHeaders);
+    const categories = getSheetData('Categories', categoriesHeaders);
     
     return ContentService.createTextOutput(JSON.stringify({ 
       status: 'success', 
       data: {
         users: users,
-        supervisionRecords: supervisionRecords
+        supervisionRecords: supervisionRecords,
+        categories: categories
       }
     })).setMimeType(ContentService.MimeType.JSON);
     
