@@ -134,13 +134,13 @@ export default function EvaluatePage() {
         
         <div className="space-y-8">
           {categories.map((cat) => (
-            <div key={cat.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors">
+            <div key={cat.id} className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors">
               <h3 className="font-semibold text-slate-800 mb-4">{cat.title}</h3>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <div className="grid grid-cols-5 gap-2 sm:gap-4">
                 {scoreOptions.map((opt) => (
                   <label key={opt.value} className={`
-                    cursor-pointer flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all
-                    ${scores[cat.id] === opt.value ? opt.color : 'border-slate-100 bg-slate-50 text-slate-600 hover:bg-slate-100'}
+                    cursor-pointer flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg border-2 transition-all text-center
+                    ${scores[cat.id] === opt.value ? opt.color : 'border-slate-100 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:border-slate-200'}
                   `}>
                     <input 
                       type="radio" 
@@ -149,8 +149,8 @@ export default function EvaluatePage() {
                       className="sr-only"
                       onChange={(e) => handleScoreChange(cat.id, e.target.value)}
                     />
-                    <span className="font-bold text-lg mb-1">{opt.value}</span>
-                    <span className="text-xs">{opt.label}</span>
+                    <span className="font-bold text-base sm:text-lg mb-1">{opt.value}</span>
+                    <span className="text-[10px] sm:text-xs leading-tight">{opt.label}</span>
                   </label>
                 ))}
               </div>
