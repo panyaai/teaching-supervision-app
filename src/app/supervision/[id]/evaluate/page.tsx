@@ -103,6 +103,7 @@ export default function EvaluatePage() {
       subject: subject,
       totalScore, // raw score (optional)
       percentageScore, // 100-point scale
+      categoryScores: scores, // send individual scores
       strengths,
       suggestions
     };

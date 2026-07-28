@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { ClipboardCheck, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
-  const [name, setName] = useState("");
+  const [userId, setUserId] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
@@ -17,16 +17,16 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     
-    if (!name.trim()) {
-      setError("กรุณากรอกชื่อผู้ใช้งาน");
+    if (!userId.trim()) {
+      setError("กรุณากรอกรหัสประจำตัว (User_ID)");
       return;
     }
 
     setIsSubmitting(true);
-    const success = await login(name.trim());
+    const success = await login(userId.trim());
     
     if (!success) {
-      setError("ไม่พบชื่อผู้ใช้งานนี้ในระบบ หรือคุณไม่มีสิทธิ์เข้าถึง");
+      setError("ไม่พบรหัสประจำตัวนี้ในระบบ หรือคุณไม่มีสิทธิ์เข้าถึง");
       setIsSubmitting(false);
     }
   };
@@ -39,14 +39,14 @@ export default function LoginPage() {
             <ClipboardCheck className="w-8 h-8 text-blue-600" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900">ระบบนิเทศการสอนออนไลน์</h1>
-          <p className="text-slate-500 mt-2">กรุณาเข้าสู่ระบบด้วยชื่อ-นามสกุลของคุณ</p>
+          <p className="text-slate-500 mt-2">กรุณาเข้าสู่ระบบด้วยรหัสประจำตัวของคุณ</p>
         </div>
 
         <Card className="shadow-lg border-slate-200">
           <CardHeader>
             <CardTitle>เข้าสู่ระบบ (Login)</CardTitle>
             <CardDescription>
-              ใช้ชื่อ-นามสกุลจริง (ตามที่ลงทะเบียนไว้ในระบบ)
+              ใช้รหัสประจำตัว (User_ID) เช่น U001, U002
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -54,10 +54,10 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <Input
                   type="text"
-                  placeholder="เช่น สมหญิง รักเรียน"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border-slate-200 focus:bg-white"
+                  placeholder="เช่น U001"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 border-slate-200 focus:bg-white uppercase"
                 />
               </div>
 

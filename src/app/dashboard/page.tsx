@@ -67,23 +67,35 @@ export default function DashboardPage() {
     { title: "คะแนนเฉลี่ย", value: avgScore.toFixed(2), icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-100" },
   ];
 
-  // Group chart data by Subject
-  const subjectScores: Record<string, { subject: string; sum: number; count: number }> = {};
+  // Group chart data by Teacher
+  const teacherScores: Record<string, { teacher: string; sum: number; count: number; prep: number; act: number; media: number; assess: number }> = {};
   records.forEach(r => {
-    const sub = r.Subject_Name || 'ไม่ระบุ';
-    if (!subjectScores[sub]) subjectScores[sub] = { subject: sub, sum: 0, count: 0 };
-    subjectScores[sub].sum += (Number(r.Total_Score) || 0);
-    subjectScores[sub].count += 1;
+    if (r.Status !== 'เสร็จสิ้น') return;
+    
+    const t = r.Teacher_Name || 'ไม่ระบุ';
+    if (!teacherScores[t]) {
+      teacherScores[t] = { teacher: t, sum: 0, count: 0, prep: 0, act: 0, media: 0, assess: 0 };
+    }
+    teacherScores[t].sum += (Number(r.Total_Score) || 0);
+    teacherScores[t].prep += (Number(r.Score_Prep) || 0);
+    teacherScores[t].act += (Number(r.Score_Activity) || 0);
+    teacherScores[t].media += (Number(r.Score_Media) || 0);
+    teacherScores[t].assess += (Number(r.Score_Assessment) || 0);
+    teacherScores[t].count += 1;
   });
 
-  const chartData = Object.values(subjectScores).map(item => ({
-    subject: item.subject,
-    score: Number((item.sum / item.count).toFixed(2))
+  const teacherData = Object.values(teacherScores).map(item => ({
+    teacher: item.teacher,
+    score: Number((item.sum / item.count).toFixed(2)),
+    evaluators: item.count,
+    prepAvg: Number((item.prep / item.count).toFixed(2)),
+    actAvg: Number((item.act / item.count).toFixed(2)),
+    mediaAvg: Number((item.media / item.count).toFixed(2)),
+    assessAvg: Number((item.assess / item.count).toFixed(2)),
   }));
 
-  // Ensure there's some mock data if empty for visualization
-  const displayChartData = chartData.length > 0 ? chartData : [
-    { subject: "ยังไม่มีข้อมูล", score: 0 }
+  const displayChartData = teacherData.length > 0 ? teacherData : [
+    { teacher: "ยังไม่มีข้อมูล", score: 0 }
   ];
 
   return (
@@ -112,22 +124,64 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 shadow-sm border-slate-200">
+        <Card className="lg:col-span-3 shadow-sm border-slate-200">
           <CardHeader>
-            <CardTitle className="text-lg font-bold text-slate-800">คะแนนประเมินเฉลี่ยแยกตามกลุ่มสาระวิชา</CardTitle>
+            <CardTitle className="text-lg font-bold text-slate-800">สรุปคะแนนประเมินแยกตามรายบุคคล</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                  <tr>
+                    <th className="py-3 px-4">ชื่อครูผู้สอน</th>
+                    <th className="py-3 px-4 text-center">จำนวนผู้ประเมิน</th>
+                    <th className="py-3 px-4 text-center">คะแนนเฉลี่ยรวม</th>
+                    <th className="py-3 px-4 text-center">เตรียมการสอน (เต็ม 5)</th>
+                    <th className="py-3 px-4 text-center">จัดกิจกรรม (เต็ม 5)</th>
+                    <th className="py-3 px-4 text-center">สื่อ/นวัตกรรม (เต็ม 5)</th>
+                    <th className="py-3 px-4 text-center">วัด/ประเมินผล (เต็ม 5)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {teacherData.length > 0 ? teacherData.map((t, i) => (
+                    <tr key={i} className="hover:bg-slate-50 transition-colors">
+                      <td className="py-3 px-4 font-bold text-slate-800">{t.teacher}</td>
+                      <td className="py-3 px-4 text-center">{t.evaluators} คน</td>
+                      <td className="py-3 px-4 text-center font-bold text-blue-600">{t.score}</td>
+                      <td className="py-3 px-4 text-center text-slate-600">{t.prepAvg}</td>
+                      <td className="py-3 px-4 text-center text-slate-600">{t.actAvg}</td>
+                      <td className="py-3 px-4 text-center text-slate-600">{t.mediaAvg}</td>
+                      <td className="py-3 px-4 text-center text-slate-600">{t.assessAvg}</td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan={7} className="py-8 text-center text-slate-500">ยังไม่มีข้อมูลการประเมินที่เสร็จสิ้น</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="shadow-sm border-slate-200">
+          <CardHeader>
+            <CardTitle className="text-lg font-bold text-slate-800">แผนภูมิเปรียบเทียบคะแนนเฉลี่ยรายบุคคล</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={displayChartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis dataKey="subject" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
+                  <XAxis dataKey="teacher" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} domain={[0, 100]} />
                   <Tooltip 
                     cursor={{ fill: '#f1f5f9' }}
                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   />
-                  <Bar dataKey="score" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={50} />
+                  <Bar dataKey="score" name="คะแนนรวมเฉลี่ย" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={50} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -140,7 +194,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {records.slice(-4).reverse().map((r, i) => (
+              {records.filter(r => r.Status === 'เสร็จสิ้น').slice(-4).reverse().map((r, i) => (
                 <div key={i} className="flex items-center gap-4 p-3 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-colors">
                   <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
                     {r.Teacher_Name.substring(0, 1)}
@@ -155,8 +209,8 @@ export default function DashboardPage() {
                   </div>
                 </div>
               ))}
-              {records.length === 0 && (
-                <div className="text-center py-8 text-gray-500">ยังไม่มีข้อมูลการประเมิน</div>
+              {records.filter(r => r.Status === 'เสร็จสิ้น').length === 0 && (
+                <div className="text-center py-8 text-gray-500">ยังไม่มีข้อมูลการประเมินที่เสร็จสิ้น</div>
               )}
             </div>
           </CardContent>

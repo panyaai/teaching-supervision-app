@@ -6,7 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 
 interface AuthContextType {
   user: User | null;
-  login: (name: string) => Promise<boolean>;
+  login: (userId: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
 }
@@ -43,12 +43,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, pathname, router]);
 
-  const login = async (name: string) => {
+  const login = async (userId: string) => {
     try {
       const { fetchGASData } = await import('@/lib/api');
       const data = await fetchGASData();
       
-      const foundUser = data.data.users.find(u => u.Name === name);
+      const foundUser = data.data.users.find(u => u.User_ID === userId);
       if (foundUser) {
         setUser(foundUser);
         localStorage.setItem('auth_user', JSON.stringify(foundUser));

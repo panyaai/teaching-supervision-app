@@ -21,6 +21,10 @@ export interface SupervisionRecord {
   Strengths: string;
   Suggestions: string;
   Plan_URL: string;
+  Score_Prep?: number;
+  Score_Activity?: number;
+  Score_Media?: number;
+  Score_Assessment?: number;
 }
 
 export interface Category {

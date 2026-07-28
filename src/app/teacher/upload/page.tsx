@@ -12,12 +12,14 @@ export default function TeacherUploadPage() {
   const { user } = useAuth();
   const router = useRouter();
   const [subject, setSubject] = useState("");
+  const [room, setRoom] = useState("");
+  const [evalTime, setEvalTime] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!subject) {
-      alert("กรุณากรอกรายวิชา");
+    if (!subject || !room || !evalTime) {
+      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
       return;
     }
 
@@ -26,7 +28,9 @@ export default function TeacherUploadPage() {
       const payload = {
         action: 'submit_plan',
         teacherName: user?.Name || '',
-        subject: subject
+        subject: subject,
+        gradeLevel: room, // repurpose Grade_Level for room
+        subjectCode: evalTime // repurpose Subject_Code for evalTime
       };
 
       let GAS_URL = process.env.NEXT_PUBLIC_GAS_URL || ''; 
@@ -93,9 +97,32 @@ export default function TeacherUploadPage() {
                 type="text" 
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="เช่น คณิตศาสตร์ ม.1"
+                placeholder="เช่น คณิตศาสตร์"
                 className="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">ห้องที่สอน</label>
+                <input 
+                  type="text" 
+                  value={room}
+                  onChange={(e) => setRoom(e.target.value)}
+                  placeholder="เช่น ม.1/2"
+                  className="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">เวลาที่รับการประเมิน</label>
+                <input 
+                  type="text" 
+                  value={evalTime}
+                  onChange={(e) => setEvalTime(e.target.value)}
+                  placeholder="เช่น 09.30 - 10.30 น."
+                  className="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
             </div>
 
             <div className="pt-4 border-t border-slate-100">
