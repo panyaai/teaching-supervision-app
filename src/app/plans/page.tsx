@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { fetchGASData, SupervisionRecord } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
 export default function PlansPage() {
   const [plans, setPlans] = useState<SupervisionRecord[]>([]);
@@ -48,11 +49,15 @@ export default function PlansPage() {
           <p className="text-gray-500 mt-1">รายการผลการนิเทศการสอนทั้งหมด (ดึงข้อมูลจาก Google Sheets)</p>
         </div>
         
+
+        
         {user && !(user?.Role.toLowerCase().includes('teacher') || user?.Role.includes('ครู')) && (
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="w-4 h-4 mr-2" />
-            สร้างแบบประเมินใหม่
-          </Button>
+          <Link href="/supervision/new/evaluate">
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="w-4 h-4 mr-2" />
+              สร้างแบบประเมินใหม่
+            </Button>
+          </Link>
         )}
       </div>
 
