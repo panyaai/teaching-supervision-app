@@ -268,27 +268,33 @@ export default function EvaluatePage() {
 
           <div className="mt-4">
             <label className="block text-xs text-slate-500 mb-1">ไฟล์แนบแผนการสอน</label>
-            {isEvaluateMode && planUrl && !planUrl.includes("Upload Failed") ? (
-              <div className="space-y-4">
-                <a 
-                  href={planUrl} 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium hover:bg-blue-100 transition-colors"
-                >
-                  <LinkIcon className="w-4 h-4 mr-2" /> เปิดดูไฟล์แผนการสอนเต็มหน้าจอ
-                </a>
-                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm h-[500px]">
-                  <iframe 
-                    src={planUrl.replace('/view', '/preview').split('?')[0]} 
-                    width="100%" 
-                    height="100%" 
-                    allow="autoplay"
-                    className="w-full h-full"
-                    title="ไฟล์แผนการสอน"
-                  ></iframe>
+            {isEvaluateMode ? (
+              planUrl && !planUrl.includes("Upload Failed") ? (
+                <div className="space-y-4">
+                  <a 
+                    href={planUrl} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium hover:bg-blue-100 transition-colors"
+                  >
+                    <LinkIcon className="w-4 h-4 mr-2" /> เปิดดูไฟล์แผนการสอนเต็มหน้าจอ
+                  </a>
+                  <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm h-[500px]">
+                    <iframe 
+                      src={planUrl.replace('/view', '/preview').split('?')[0]} 
+                      width="100%" 
+                      height="100%" 
+                      allow="autoplay"
+                      className="w-full h-full"
+                      title="ไฟล์แผนการสอน"
+                    ></iframe>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-lg text-slate-500">
+                  ไม่พบไฟล์แนบแผนการสอนจากครูผู้สอน
+                </div>
+              )
             ) : (
               <div className="relative">
                 <input 
@@ -297,9 +303,9 @@ export default function EvaluatePage() {
                   onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
                   className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
+                {file && <p className="text-xs text-green-600 mt-1">✓ เลือกไฟล์แล้ว: {file.name}</p>}
               </div>
             )}
-            {file && <p className="text-xs text-green-600 mt-1">✓ เลือกไฟล์แล้ว: {file.name}</p>}
           </div>
       </div>
 
