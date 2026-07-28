@@ -322,8 +322,8 @@ export default function EvaluatePage() {
           </div>
         ) : (
           <div className="space-y-6 sm:space-y-8">
-            {categories.map((cat) => (
-              <div key={cat.Category_ID} className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors">
+            {categories.filter(cat => cat.Category_ID || cat.Title).map((cat, idx) => (
+              <div key={cat.Category_ID || idx} className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors">
                 <h3 className="font-semibold text-slate-800 mb-4">{cat.Title}</h3>
                 <div className="grid grid-cols-5 gap-2 sm:gap-4">
                   {scoreOptions.map((opt) => (
