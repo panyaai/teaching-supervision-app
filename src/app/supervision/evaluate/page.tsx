@@ -106,9 +106,13 @@ function EvaluateForm() {
     let scorePrep = 0, scoreActivity = 0, scoreMedia = 0, scoreAssessment = 0;
     
     if (itemValues.length >= 20) {
-      scorePrep = itemValues.slice(0, 5).reduce((a, b) => a + b, 0) / 5;
-      scoreActivity = itemValues.slice(5, 10).reduce((a, b) => a + b, 0) / 5;
-      scoreMedia = itemValues.slice(10, 15).reduce((a, b) => a + b, 0) / 5;
+      // 1-4 (index 0-3) = 4 items
+      scorePrep = itemValues.slice(0, 4).reduce((a, b) => a + b, 0) / 4;
+      // 5-8 (index 4-7) = 4 items
+      scoreActivity = itemValues.slice(4, 8).reduce((a, b) => a + b, 0) / 4;
+      // 9-15 (index 8-14) = 7 items
+      scoreMedia = itemValues.slice(8, 15).reduce((a, b) => a + b, 0) / 7;
+      // 16-20 (index 15-19) = 5 items
       scoreAssessment = itemValues.slice(15, 20).reduce((a, b) => a + b, 0) / 5;
     } else {
       // Fallback if not exactly 20 items (try to distribute evenly)
