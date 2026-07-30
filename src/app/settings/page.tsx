@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Settings as SettingsIcon, Save, Database, Bell, Shield, Loader2 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -13,6 +13,7 @@ export default function SettingsPage() {
   const [term, setTerm] = useState("1");
   const [isSaving, setIsSaving] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     // Load saved settings from local storage
@@ -50,6 +51,18 @@ export default function SettingsPage() {
   };
 
   if (!mounted) return null;
+
+  const isAdmin = user?.Role.toLowerCase().includes('admin');
+
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh]">
+        <Shield className="w-16 h-16 text-red-500 mb-4" />
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">ไม่มีสิทธิ์เข้าถึง</h2>
+        <p className="text-gray-500 font-medium">เฉพาะผู้ดูแลระบบ (Admin) เท่านั้นที่สามารถตั้งค่าระบบได้</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">

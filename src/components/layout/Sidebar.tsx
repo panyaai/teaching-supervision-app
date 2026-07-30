@@ -11,6 +11,8 @@ export default function Sidebar() {
 
   let menuItems = [];
 
+  const isAdmin = user?.Role.toLowerCase().includes('admin');
+
   if (isTeacher) {
     menuItems = [
       { icon: LayoutDashboard, label: 'แดชบอร์ดของฉัน', href: '/dashboard' },
@@ -23,8 +25,10 @@ export default function Sidebar() {
       { icon: FileText, label: 'ประวัติการนิเทศ', href: '/plans' },
       { icon: ClipboardCheck, label: 'นิเทศการสอน', href: '/supervision/pending' },
       { icon: Users, label: 'บุคลากร', href: '/users' },
-      { icon: Settings, label: 'ตั้งค่าระบบ', href: '/settings' },
     ];
+    if (isAdmin) {
+      menuItems.push({ icon: Settings, label: 'ตั้งค่าระบบ', href: '/settings' });
+    }
   }
 
   return (
