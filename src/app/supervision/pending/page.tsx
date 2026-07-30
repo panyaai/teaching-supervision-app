@@ -4,13 +4,15 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { fetchGASData, SupervisionRecord } from "@/lib/api";
-import { ClipboardCheck, Loader2, Calendar, User, FileText, ArrowRight, Plus } from "lucide-react";
+import { ClipboardCheck, Loader2, Calendar, User, FileText, ArrowRight, Search } from "lucide-react";
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { Input } from "@/components/ui/input";
 
 export default function PendingSupervisionPage() {
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<SupervisionRecord[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const { user } = useAuth();
 
   useEffect(() => {
@@ -79,25 +81,38 @@ export default function PendingSupervisionPage() {
         </div>
         
         {isSupervisor && (
-          <Link href="/supervision/new/evaluate">
-            <Button className="bg-blue-600 hover:bg-blue-700 shadow-md">
-              <User className="w-4 h-4 mr-2" />
-              เลือกครูตามรายชื่อเพื่อนิเทศการสอน
-            </Button>
-          </Link>
+          <div className="relative w-full sm:w-72">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Input 
+              placeholder="ระบุชื่อครูเพื่อค้นหา..." 
+              className="pl-9 border-blue-200 focus:border-blue-500 focus:ring-blue-500 bg-white" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         )}
       </div>
 
       <div className="grid gap-4">
-        {records.length === 0 ? (
-          <Card className="border-dashed bg-slate-50 border-2">
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <ClipboardCheck className="w-16 h-16 text-slate-300 mb-4" />
-              <p className="text-lg font-medium text-slate-500">ไม่มีคำขอที่รอการประเมินในขณะนี้</p>
-            </CardContent>
-          </Card>
-        ) : (
-          records.map((record, idx) => (
+        {(() => {
+          const filteredRecords = records.filter(record => 
+            record.Teacher_Name?.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+
+          if (filteredRecords.length === 0) {
+            return (
+              <Card className="border-dashed bg-slate-50 border-2">
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <ClipboardCheck className="w-16 h-16 text-slate-300 mb-4" />
+                  <p className="text-lg font-medium text-slate-500">
+                    {searchTerm ? "ไม่พบรายชื่อครูที่ค้นหา" : "ไม่มีคำขอที่รอการประเมินในขณะนี้"}
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          }
+
+          return filteredRecords.map((record, idx) => (
             <Card key={idx} className="hover:shadow-md transition-shadow border-slate-200">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -140,8 +155,8 @@ export default function PendingSupervisionPage() {
                 </div>
               </CardContent>
             </Card>
-          ))
-        )}
+          ));
+        })()}
       </div>
     </div>
   );
