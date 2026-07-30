@@ -146,7 +146,7 @@ export default function PendingSupervisionPage() {
                         <FileText className="w-4 h-4" /> ดูไฟล์ที่แนบมา
                       </a>
                     )}
-                    <Link href={`/supervision/${record.Supervision_ID}/evaluate`}>
+                    <Link href={`/supervision/evaluate?id=${record.Supervision_ID}`}>
                       <Button className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto">
                         เริ่มประเมิน <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>

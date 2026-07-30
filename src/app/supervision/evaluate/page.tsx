@@ -4,11 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { Save, Send, User, BookOpen, Calendar, Link as LinkIcon, AlertCircle, Loader2, FileText } from 'lucide-react';
 import { fetchGASData, User as UserType, Category } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
-import { useParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function EvaluatePage() {
-  const params = useParams();
-  const id = params.id as string;
+function EvaluateForm() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
   const isEvaluateMode = Boolean(id && id !== '1' && id !== 'new');
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -324,5 +325,13 @@ export default function EvaluatePage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function EvaluatePage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-slate-500">กำลังโหลด...</div>}>
+      <EvaluateForm />
+    </Suspense>
   );
 }
