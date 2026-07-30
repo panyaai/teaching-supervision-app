@@ -12,6 +12,7 @@ import Link from "next/link";
 
 export default function PlansPage() {
   const [plans, setPlans] = useState<SupervisionRecord[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
@@ -57,10 +58,15 @@ export default function PlansPage() {
       <Card>
         <CardHeader className="pb-3">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <CardTitle className="text-lg">รายการทั้งหมด ({plans.length} รายการ)</CardTitle>
+            <CardTitle className="text-lg">รายการทั้งหมด</CardTitle>
             <div className="relative w-full sm:w-72">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <Input placeholder="ระบุชื่อครูเพื่อค้นหา..." className="pl-9 border-blue-200 focus:border-blue-500 focus:ring-blue-500" />
+              <Input 
+                placeholder="ระบุชื่อครู หรือ รายวิชา..." 
+                className="pl-9 border-blue-200 focus:border-blue-500 focus:ring-blue-500" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
           </div>
         </CardHeader>
@@ -84,7 +90,13 @@ export default function PlansPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {plans.length > 0 ? plans.reverse().map((plan, i) => (
+                  {(() => {
+                    const filteredPlans = plans.filter(plan => 
+                      (plan.Teacher_Name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) || 
+                      (plan.Subject_Name?.toLowerCase() || "").includes(searchTerm.toLowerCase())
+                    );
+                    
+                    return filteredPlans.length > 0 ? filteredPlans.reverse().map((plan, i) => (
                     <TableRow key={i}>
                       <TableCell className="font-medium text-slate-500">{plan.Supervision_ID}</TableCell>
                       <TableCell className="font-bold text-slate-800">{plan.Teacher_Name}</TableCell>
@@ -105,10 +117,11 @@ export default function PlansPage() {
                   )) : (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-                        ยังไม่มีข้อมูลการนิเทศในระบบ
+                        {searchTerm ? "ไม่พบข้อมูลที่ค้นหา" : "ยังไม่มีข้อมูลการนิเทศในระบบ"}
                       </TableCell>
                     </TableRow>
-                  )}
+                  )
+                  })()}
                 </TableBody>
               </Table>
             </div>

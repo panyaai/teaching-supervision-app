@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 
 export default function SettingsPage() {
   const [gasUrl, setGasUrl] = useState("");
-  const [year, setYear] = useState("2567");
+  const [year, setYear] = useState("2569");
   const [term, setTerm] = useState("1");
   const [isSaving, setIsSaving] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -17,7 +17,7 @@ export default function SettingsPage() {
   useEffect(() => {
     // Load saved settings from local storage
     const savedGasUrl = localStorage.getItem("gasUrl") || process.env.NEXT_PUBLIC_GAS_URL || "";
-    const savedYear = localStorage.getItem("academicYear") || "2567";
+    const savedYear = localStorage.getItem("academicYear") || "2569";
     const savedTerm = localStorage.getItem("academicTerm") || "1";
 
     setGasUrl(savedGasUrl);

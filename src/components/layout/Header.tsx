@@ -2,9 +2,23 @@
 
 import { Bell, UserCircle, Menu, LogOut } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useState, useEffect } from 'react';
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const [academicYear, setAcademicYear] = useState('ปีการศึกษา 2569 / ภาคเรียนที่ 1');
+
+  useEffect(() => {
+    const updateYear = () => {
+      const term = localStorage.getItem('academicTerm') || '1';
+      const year = localStorage.getItem('academicYear') || '2569';
+      setAcademicYear(`ปีการศึกษา ${year} / ภาคเรียนที่ ${term}`);
+    };
+    
+    updateYear();
+    window.addEventListener('academicSettingsChanged', updateYear);
+    return () => window.removeEventListener('academicSettingsChanged', updateYear);
+  }, []);
 
   return (
     <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6">
@@ -16,7 +30,7 @@ export default function Header() {
       </div>
       
       <div className="hidden md:flex items-center text-sm text-gray-500">
-        <span>ปีการศึกษา 2567 / ภาคเรียนที่ 1</span>
+        <span>{academicYear}</span>
       </div>
 
       <div className="flex items-center gap-4">
