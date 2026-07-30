@@ -29,7 +29,11 @@ export default function LoginPage() {
       setError("ยังไม่ได้ตั้งค่าฐานข้อมูล กรุณาติดต่อผู้ดูแลระบบเพื่อตั้งค่า GAS_URL");
       setIsSubmitting(false);
     } else if (!result?.success) {
-      setError("ไม่พบรหัสประจำตัวนี้ในระบบ หรือคุณไม่มีสิทธิ์เข้าถึง");
+      if (result?.error && result.error !== "Failed to fetch") {
+        setError(`ข้อผิดพลาด: ${result.error}`);
+      } else {
+        setError("ไม่พบรหัสประจำตัวนี้ในระบบ หรือการเชื่อมต่อฐานข้อมูลล้มเหลว (Failed to fetch)");
+      }
       setIsSubmitting(false);
     }
   };
