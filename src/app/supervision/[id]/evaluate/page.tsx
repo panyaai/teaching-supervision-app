@@ -144,11 +144,11 @@ export default function EvaluatePage() {
   };
 
   const scoreOptions = [
-    { value: '5', label: 'ดีเยี่ยม', color: 'bg-green-100 text-green-700 border-green-300' },
-    { value: '4', label: 'ดีมาก', color: 'bg-blue-100 text-blue-700 border-blue-300' },
-    { value: '3', label: 'ดี', color: 'bg-teal-100 text-teal-700 border-teal-300' },
-    { value: '2', label: 'พอใช้', color: 'bg-yellow-100 text-yellow-700 border-yellow-300' },
-    { value: '1', label: 'ปรับปรุง', color: 'bg-red-100 text-red-700 border-red-300' }
+    { value: '5', label: 'ดีเยี่ยม', color: 'bg-green-500 text-white border-green-600 shadow-sm' },
+    { value: '4', label: 'ดีมาก', color: 'bg-blue-500 text-white border-blue-600 shadow-sm' },
+    { value: '3', label: 'ดี', color: 'bg-teal-500 text-white border-teal-600 shadow-sm' },
+    { value: '2', label: 'พอใช้', color: 'bg-amber-500 text-white border-amber-600 shadow-sm' },
+    { value: '1', label: 'ปรับปรุง', color: 'bg-red-500 text-white border-red-600 shadow-sm' }
   ];
 
   return (
