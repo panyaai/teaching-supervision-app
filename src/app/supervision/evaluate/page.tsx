@@ -93,11 +93,40 @@ function EvaluateForm() {
 
     setIsSubmitting(true);
     let totalScore = 0;
-    Object.values(scores).forEach(s => totalScore += parseInt(s));
+    const itemValues = Object.values(scores).map(s => parseInt(s) || 0);
+    itemValues.forEach(s => totalScore += s);
     
     // Calculate 100-point scale percentage
-    const maxPossibleScore = Object.keys(scores).length * 5;
+    const maxPossibleScore = itemValues.length * 5;
     const percentageScore = maxPossibleScore > 0 ? Math.round((totalScore / maxPossibleScore) * 100) : 0;
+
+    // The backend expects preparation, activity, media, assessment
+    // We assume the 20 items are ordered in 4 groups of 5.
+    // If there are exactly 20 items, we average each group of 5 to get a score out of 5.
+    let scorePrep = 0, scoreActivity = 0, scoreMedia = 0, scoreAssessment = 0;
+    
+    if (itemValues.length >= 20) {
+      scorePrep = itemValues.slice(0, 5).reduce((a, b) => a + b, 0) / 5;
+      scoreActivity = itemValues.slice(5, 10).reduce((a, b) => a + b, 0) / 5;
+      scoreMedia = itemValues.slice(10, 15).reduce((a, b) => a + b, 0) / 5;
+      scoreAssessment = itemValues.slice(15, 20).reduce((a, b) => a + b, 0) / 5;
+    } else {
+      // Fallback if not exactly 20 items (try to distribute evenly)
+      const chunkSize = Math.ceil(itemValues.length / 4) || 1;
+      const getAvg = (arr: number[]) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+      
+      scorePrep = getAvg(itemValues.slice(0, chunkSize));
+      scoreActivity = getAvg(itemValues.slice(chunkSize, chunkSize * 2));
+      scoreMedia = getAvg(itemValues.slice(chunkSize * 2, chunkSize * 3));
+      scoreAssessment = getAvg(itemValues.slice(chunkSize * 3));
+    }
+
+    const aggregatedScores = {
+      preparation: scorePrep,
+      activity: scoreActivity,
+      media: scoreMedia,
+      assessment: scoreAssessment
+    };
 
     const payload = {
       action: isEvaluateMode ? 'evaluate' : 'submit_plan',
@@ -107,7 +136,7 @@ function EvaluateForm() {
       subject: subject,
       totalScore, // raw score (optional)
       percentageScore, // 100-point scale
-      categoryScores: scores, // send individual scores
+      categoryScores: aggregatedScores, // send aggregated averages
       strengths,
       suggestions
     };
