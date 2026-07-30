@@ -107,8 +107,7 @@ function doPost(e) {
           const blob = Utilities.newBlob(decodedData, contentType, data.fileName);
           const file = folder.createFile(blob);
           
-          const fileId = file.getId();
-          planUrl = 'https://lh3.googleusercontent.com/d/' + fileId;
+          planUrl = file.getUrl();
         } catch (e) {
           planUrl = 'Upload Failed: ' + e.toString();
         }

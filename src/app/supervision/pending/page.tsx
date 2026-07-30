@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { fetchGASData, SupervisionRecord } from "@/lib/api";
-import { ClipboardCheck, Loader2, Calendar, User, FileText, ArrowRight } from "lucide-react";
+import { ClipboardCheck, Loader2, Calendar, User, FileText, ArrowRight, Plus } from "lucide-react";
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
@@ -69,12 +69,23 @@ export default function PendingSupervisionPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <ClipboardCheck className="w-8 h-8 text-blue-600" />
-          รายการรอประเมิน
-        </h1>
-        <p className="text-gray-500 mt-1">รายชื่อคำขอที่ส่งเข้ามาและกำลังรอการนิเทศจากกรรมการ</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <ClipboardCheck className="w-8 h-8 text-blue-600" />
+            นิเทศการสอน
+          </h1>
+          <p className="text-gray-500 mt-1">รายชื่อคำขอที่ส่งเข้ามาและกำลังรอการนิเทศจากกรรมการ</p>
+        </div>
+        
+        {isSupervisor && (
+          <Link href="/supervision/new/evaluate">
+            <Button className="bg-blue-600 hover:bg-blue-700 shadow-md">
+              <User className="w-4 h-4 mr-2" />
+              เลือกครูตามรายชื่อเพื่อนิเทศการสอน
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="grid gap-4">

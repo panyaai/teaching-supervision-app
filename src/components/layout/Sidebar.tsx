@@ -20,8 +20,8 @@ export default function Sidebar() {
   } else {
     menuItems = [
       { icon: LayoutDashboard, label: 'แดชบอร์ดภาพรวม', href: '/dashboard' },
-      { icon: FileText, label: 'รายการประเมิน', href: '/plans' },
-      { icon: ClipboardCheck, label: 'ประเมินการสอน', href: '/supervision/pending' },
+      { icon: FileText, label: 'ประวัติการนิเทศ', href: '/plans' },
+      { icon: ClipboardCheck, label: 'นิเทศการสอน', href: '/supervision/pending' },
       { icon: Users, label: 'บุคลากร', href: '/users' },
       { icon: Settings, label: 'ตั้งค่าระบบ', href: '/settings' },
     ];

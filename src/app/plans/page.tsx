@@ -51,14 +51,7 @@ export default function PlansPage() {
         
 
         
-        {user && !(user?.Role.toLowerCase().includes('teacher') || user?.Role.includes('ครู')) && (
-          <Link href="/supervision/new/evaluate">
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
-              สร้างแบบประเมินใหม่
-            </Button>
-          </Link>
-        )}
+
       </div>
 
       <Card>
@@ -67,7 +60,7 @@ export default function PlansPage() {
             <CardTitle className="text-lg">รายการทั้งหมด ({plans.length} รายการ)</CardTitle>
             <div className="relative w-full sm:w-72">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <Input placeholder="ค้นหาชื่อครู, รายวิชา..." className="pl-9" />
+              <Input placeholder="ระบุชื่อครูเพื่อค้นหา..." className="pl-9 border-blue-200 focus:border-blue-500 focus:ring-blue-500" />
             </div>
           </div>
         </CardHeader>
