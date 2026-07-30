@@ -3,9 +3,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { FileText, Plus, Search, Eye, Loader2 } from "lucide-react";
+import { FileText, Plus, Search, Eye, Loader2, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { fetchGASData, SupervisionRecord } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
@@ -14,6 +14,7 @@ export default function PlansPage() {
   const [plans, setPlans] = useState<SupervisionRecord[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -87,6 +88,7 @@ export default function PlansPage() {
                     <TableHead>วันที่นิเทศ</TableHead>
                     <TableHead>คะแนน</TableHead>
                     <TableHead>ระดับ</TableHead>
+                    <TableHead className="text-right">รายละเอียด</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -97,23 +99,50 @@ export default function PlansPage() {
                     );
                     
                     return filteredPlans.length > 0 ? filteredPlans.reverse().map((plan, i) => (
-                    <TableRow key={i}>
-                      <TableCell className="font-medium text-slate-500">{plan.Supervision_ID}</TableCell>
-                      <TableCell className="font-bold text-slate-800">{plan.Teacher_Name}</TableCell>
-                      <TableCell>{plan.Subject_Name}</TableCell>
-                      <TableCell>{new Date(plan.Date_Time).toLocaleDateString('th-TH')}</TableCell>
-                      <TableCell className="font-bold text-blue-600">{plan.Total_Score}</TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          plan.Rating_Level === 'ดีเยี่ยม' ? 'bg-green-100 text-green-700' :
-                          plan.Rating_Level === 'ดีมาก' ? 'bg-blue-100 text-blue-700' :
-                          plan.Rating_Level === 'ดี' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-red-100 text-red-700'
-                        }`}>
-                          {plan.Rating_Level}
-                        </span>
-                      </TableCell>
-                    </TableRow>
+                    <React.Fragment key={plan.Supervision_ID || i}>
+                      <TableRow className="hover:bg-slate-50 cursor-pointer" onClick={() => setExpandedRow(expandedRow === plan.Supervision_ID ? null : plan.Supervision_ID)}>
+                        <TableCell className="font-medium text-slate-500">{plan.Supervision_ID}</TableCell>
+                        <TableCell className="font-bold text-slate-800">{plan.Teacher_Name}</TableCell>
+                        <TableCell>{plan.Subject_Name}</TableCell>
+                        <TableCell>{new Date(plan.Date_Time).toLocaleDateString('th-TH')}</TableCell>
+                        <TableCell className="font-bold text-blue-600">{plan.Total_Score}</TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            plan.Rating_Level === 'ดีเยี่ยม' ? 'bg-green-100 text-green-700' :
+                            plan.Rating_Level === 'ดีมาก' ? 'bg-blue-100 text-blue-700' :
+                            plan.Rating_Level === 'ดี' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-red-100 text-red-700'
+                          }`}>
+                            {plan.Rating_Level}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800 hover:bg-blue-50">
+                            <Eye className="w-4 h-4 mr-1" /> ดูความเห็น
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                      {expandedRow === plan.Supervision_ID && (
+                        <TableRow className="bg-blue-50/50">
+                          <TableCell colSpan={7} className="p-0 border-b-2 border-blue-100">
+                            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-100">
+                                <h4 className="font-semibold text-blue-800 mb-2 flex items-center">
+                                  <FileText className="w-4 h-4 mr-2" /> จุดเด่นของการสอน
+                                </h4>
+                                <p className="text-slate-600 text-sm whitespace-pre-wrap">{plan.Strengths || '-'}</p>
+                              </div>
+                              <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-100">
+                                <h4 className="font-semibold text-amber-600 mb-2 flex items-center">
+                                  <FileText className="w-4 h-4 mr-2" /> ข้อเสนอแนะเพื่อการพัฒนา
+                                </h4>
+                                <p className="text-slate-600 text-sm whitespace-pre-wrap">{plan.Suggestions || '-'}</p>
+                              </div>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </React.Fragment>
                   )) : (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8 text-gray-500">
