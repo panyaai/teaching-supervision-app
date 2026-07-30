@@ -136,9 +136,9 @@ export default function DashboardPage() {
                     <th className="py-3 px-4">ชื่อครูผู้สอน</th>
                     <th className="py-3 px-4 text-center">จำนวนผู้ประเมิน</th>
                     <th className="py-3 px-4 text-center">คะแนนเฉลี่ยรวม</th>
-                    <th className="py-3 px-4 text-center">เตรียมการสอน (เต็ม 5)</th>
-                    <th className="py-3 px-4 text-center">จัดกิจกรรม (เต็ม 5)</th>
-                    <th className="py-3 px-4 text-center">สื่อ/นวัตกรรม (เต็ม 5)</th>
+                    <th className="py-3 px-4 text-center">เตรียมการสอน (เต็ม 4)</th>
+                    <th className="py-3 px-4 text-center">จัดกิจกรรม (เต็ม 4)</th>
+                    <th className="py-3 px-4 text-center">สื่อ/นวัตกรรม (เต็ม 7)</th>
                     <th className="py-3 px-4 text-center">วัด/ประเมินผล (เต็ม 5)</th>
                   </tr>
                 </thead>
