@@ -18,7 +18,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     // Load saved settings from local storage
-    const savedGasUrl = localStorage.getItem("gasUrl") || process.env.NEXT_PUBLIC_GAS_URL || "";
+    const savedGasUrl = localStorage.getItem("gasUrl") || process.env.NEXT_PUBLIC_GAS_URL || "https://script.google.com/macros/s/AKfycbzfwjjceGES37MicY-46rpPjAwGLY6OaOwTFAYztfUUfCRdvbEy0HVMjliOnArwS39G/exec";
     const savedYear = localStorage.getItem("academicYear") || "2569";
     const savedTerm = localStorage.getItem("academicTerm") || "1";
 
@@ -54,9 +54,8 @@ export default function SettingsPage() {
   if (!mounted) return null;
 
   const isAdmin = user?.Role.toLowerCase().includes('admin');
-  const hasGasUrl = Boolean(localStorage.getItem("gasUrl") || process.env.NEXT_PUBLIC_GAS_URL);
 
-  if (!isAdmin && hasGasUrl) {
+  if (!isAdmin) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh]">
         <Shield className="w-16 h-16 text-red-500 mb-4" />

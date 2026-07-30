@@ -42,7 +42,7 @@ export interface GASResponse {
 }
 
 export async function fetchGASData(): Promise<GASResponse> {
-  let GAS_URL = process.env.NEXT_PUBLIC_GAS_URL;
+  let GAS_URL = process.env.NEXT_PUBLIC_GAS_URL || "https://script.google.com/macros/s/AKfycbzfwjjceGES37MicY-46rpPjAwGLY6OaOwTFAYztfUUfCRdvbEy0HVMjliOnArwS39G/exec";
   
   if (typeof window !== "undefined") {
     const savedUrl = localStorage.getItem("gasUrl");
