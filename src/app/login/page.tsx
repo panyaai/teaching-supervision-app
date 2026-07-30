@@ -23,9 +23,12 @@ export default function LoginPage() {
     }
 
     setIsSubmitting(true);
-    const success = await login(userId.trim());
+    const result = await login(userId.trim());
     
-    if (!success) {
+    if (result?.error && result.error.includes("GAS_URL")) {
+      setError("ยังไม่ได้ตั้งค่าฐานข้อมูล กรุณาติดต่อผู้ดูแลระบบเพื่อตั้งค่า GAS_URL");
+      setIsSubmitting(false);
+    } else if (!result?.success) {
       setError("ไม่พบรหัสประจำตัวนี้ในระบบ หรือคุณไม่มีสิทธิ์เข้าถึง");
       setIsSubmitting(false);
     }
@@ -62,8 +65,13 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
-                  {error}
+                <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100 flex flex-col gap-2">
+                  <span>{error}</span>
+                  {error.includes("ฐานข้อมูล") && (
+                    <a href="/settings" className="text-blue-600 font-semibold underline text-center block mt-1">
+                      คลิกที่นี่เพื่อไปหน้าตั้งค่าระบบ
+                    </a>
+                  )}
                 </div>
               )}
 

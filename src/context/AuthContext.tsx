@@ -6,14 +6,14 @@ import { useRouter, usePathname } from 'next/navigation';
 
 interface AuthContextType {
   user: User | null;
-  login: (userId: string) => Promise<boolean>;
+  login: (userId: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  login: async () => false,
+  login: async () => ({ success: false }),
   logout: () => {},
   loading: true
 });
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, pathname, router]);
 
-  const login = async (userId: string) => {
+  const login = async (userId: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const { fetchGASData } = await import('@/lib/api');
       const data = await fetchGASData();
@@ -52,12 +52,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (foundUser) {
         setUser(foundUser);
         localStorage.setItem('auth_user', JSON.stringify(foundUser));
-        return true;
+        return { success: true };
       }
-      return false;
-    } catch (error) {
+      return { success: false };
+    } catch (error: any) {
       console.error("Login failed:", error);
-      return false;
+      return { success: false, error: error.message };
     }
   };
 
