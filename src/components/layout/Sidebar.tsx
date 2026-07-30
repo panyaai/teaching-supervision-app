@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { LayoutDashboard, FileText, ClipboardCheck, Users, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, FileText, ClipboardCheck, Users, Settings, LogOut, User } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Sidebar() {
@@ -35,7 +35,7 @@ export default function Sidebar() {
     <aside className="w-64 bg-blue-900 text-white min-h-screen flex flex-col hidden md:flex">
       <div className="p-6">
         <h1 className="text-xl font-bold flex items-center gap-2">
-          <ClipboardCheck className="w-6 h-6 text-blue-300" />
+          <User className="w-7 h-7 text-blue-300" />
           ระบบนิเทศการสอน
         </h1>
       </div>
@@ -54,6 +54,9 @@ export default function Sidebar() {
           );
         })}
       </nav>
+      <div className="p-4 border-t border-blue-800 text-xs text-blue-300/70 text-center font-light">
+        ผู้พัฒนา :: panya prombut 2026
+      </div>
     </aside>
   );
 }
