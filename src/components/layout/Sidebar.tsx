@@ -35,7 +35,7 @@ export default function Sidebar() {
     <aside className="w-64 bg-blue-900 text-white min-h-screen flex flex-col hidden md:flex">
       <div className="p-6">
         <h1 className="text-xl font-bold flex items-center gap-2">
-          <User className="w-7 h-7 text-blue-300" />
+          <img src="https://cdn.jsdelivr.net/gh/panyaai/ctt/ctt.png" alt="Logo" className="w-8 h-8 rounded-full border border-blue-300/50 object-cover" />
           ระบบนิเทศการสอน
         </h1>
       </div>

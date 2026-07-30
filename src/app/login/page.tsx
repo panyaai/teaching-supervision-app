@@ -35,8 +35,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 p-4 absolute inset-0 z-50">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm mb-4 shadow-lg border border-white/30">
-            <User className="w-10 h-10 text-white" />
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm mb-4 shadow-lg border border-white/30 overflow-hidden p-1">
+            <img src="https://cdn.jsdelivr.net/gh/panyaai/ctt/ctt.png" alt="Logo" className="w-full h-full object-cover rounded-full" />
           </div>
           <h1 className="text-3xl font-bold text-white drop-shadow-md">ระบบนิเทศการสอนออนไลน์</h1>
           <p className="text-blue-100 mt-2 font-medium">กรุณาเข้าสู่ระบบด้วยรหัสประจำตัวของคุณ</p>
