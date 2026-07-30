@@ -14,7 +14,7 @@ export default function Sidebar() {
   if (isTeacher) {
     menuItems = [
       { icon: LayoutDashboard, label: 'แดชบอร์ดของฉัน', href: '/dashboard' },
-      { icon: FileText, label: 'ส่งแผนการสอน', href: '/teacher/upload' },
+      { icon: FileText, label: 'ขอรับการนิเทศ', href: '/teacher/upload' },
       { icon: ClipboardCheck, label: 'ประวัติรับการนิเทศ', href: '/plans' }, // Use /plans but filter for teacher
     ];
   } else {

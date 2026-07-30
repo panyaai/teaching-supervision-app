@@ -97,6 +97,23 @@ function doPost(e) {
     const action = data.action;
 
     if (action === 'submit_plan') {
+      let planUrl = '';
+      if (data.fileBase64 && data.fileName) {
+        try {
+          const folderId = '1qbCKw09scehqCJlNhHLMs6XqCLl6p8IB';
+          const folder = DriveApp.getFolderById(folderId);
+          const contentType = data.mimeType || 'application/octet-stream';
+          const decodedData = Utilities.base64Decode(data.fileBase64);
+          const blob = Utilities.newBlob(decodedData, contentType, data.fileName);
+          const file = folder.createFile(blob);
+          
+          const fileId = file.getId();
+          planUrl = 'https://lh3.googleusercontent.com/d/' + fileId;
+        } catch (e) {
+          planUrl = 'Upload Failed: ' + e.toString();
+        }
+      }
+
       const row = [
         'SUP' + new Date().getTime().toString().substr(-6),
         new Date().toISOString(),
@@ -110,7 +127,7 @@ function doPost(e) {
         '-', // Rating_Level
         '', // Strengths
         '', // Suggestions
-        '', // Plan_URL
+        planUrl, // Plan_URL
         0, 0, 0, 0 // Scores
       ];
       sheet.appendRow(row);

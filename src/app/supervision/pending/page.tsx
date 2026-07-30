@@ -74,7 +74,7 @@ export default function PendingSupervisionPage() {
           <ClipboardCheck className="w-8 h-8 text-blue-600" />
           รายการรอประเมิน
         </h1>
-        <p className="text-gray-500 mt-1">รายชื่อแผนการสอนที่ส่งเข้ามาและกำลังรอการนิเทศจากกรรมการ</p>
+        <p className="text-gray-500 mt-1">รายชื่อคำขอที่ส่งเข้ามาและกำลังรอการนิเทศจากกรรมการ</p>
       </div>
 
       <div className="grid gap-4">
@@ -82,7 +82,7 @@ export default function PendingSupervisionPage() {
           <Card className="border-dashed bg-slate-50 border-2">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <ClipboardCheck className="w-16 h-16 text-slate-300 mb-4" />
-              <p className="text-lg font-medium text-slate-500">ไม่มีแผนการสอนที่รอการประเมินในขณะนี้</p>
+              <p className="text-lg font-medium text-slate-500">ไม่มีคำขอที่รอการประเมินในขณะนี้</p>
             </CardContent>
           </Card>
         ) : (
@@ -117,7 +117,7 @@ export default function PendingSupervisionPage() {
                         rel="noreferrer"
                         className="text-sm text-blue-600 hover:underline flex items-center gap-1"
                       >
-                        <FileText className="w-4 h-4" /> เปิดดูไฟล์แผนการสอน
+                        <FileText className="w-4 h-4" /> ดูไฟล์ที่แนบมา
                       </a>
                     )}
                     <Link href={`/supervision/${record.Supervision_ID}/evaluate`}>

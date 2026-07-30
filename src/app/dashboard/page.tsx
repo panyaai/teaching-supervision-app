@@ -62,7 +62,7 @@ export default function DashboardPage() {
 
   const statCards = [
     { title: "ครูทั้งหมด", value: teachersCount.toString(), icon: Users, color: "text-blue-600", bg: "bg-blue-100" },
-    { title: "แผนการสอน", value: totalSupervisions.toString(), icon: FileText, color: "text-purple-600", bg: "bg-purple-100" },
+    { title: "รายการขอรับการนิเทศ", value: totalSupervisions.toString(), icon: FileText, color: "text-purple-600", bg: "bg-purple-100" },
     { title: "นิเทศเสร็จสิ้น", value: completed.toString(), icon: CheckCircle, color: "text-green-600", bg: "bg-green-100" },
     { title: "คะแนนเฉลี่ย", value: avgScore.toFixed(2), icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-100" },
   ];

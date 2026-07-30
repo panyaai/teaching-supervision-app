@@ -14,7 +14,34 @@ export default function TeacherUploadPage() {
   const [subject, setSubject] = useState("");
   const [room, setRoom] = useState("");
   const [evalTime, setEvalTime] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [fileBase64, setFileBase64] = useState("");
+  const [fileName, setFileName] = useState("");
+  const [mimeType, setMimeType] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        alert("ขนาดไฟล์ต้องไม่เกิน 5MB");
+        e.target.value = '';
+        return;
+      }
+      setFile(selectedFile);
+      setFileName(selectedFile.name);
+      setMimeType(selectedFile.type);
+      
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // The result is like "data:image/png;base64,iVBORw0KGgo..."
+        const base64Str = result.split(',')[1];
+        setFileBase64(base64Str);
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,8 +56,11 @@ export default function TeacherUploadPage() {
         action: 'submit_plan',
         teacherName: user?.Name || '',
         subject: subject,
-        gradeLevel: room, // repurpose Grade_Level for room
-        subjectCode: evalTime // repurpose Subject_Code for evalTime
+        gradeLevel: room,
+        subjectCode: evalTime,
+        fileBase64: fileBase64,
+        fileName: fileName,
+        mimeType: mimeType
       };
 
       let GAS_URL = process.env.NEXT_PUBLIC_GAS_URL || ''; 
@@ -125,6 +155,16 @@ export default function TeacherUploadPage() {
               </div>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">ไฟล์แผนการสอน (ไม่เกิน 5MB)</label>
+              <input 
+                type="file" 
+                onChange={handleFileChange}
+                accept=".pdf,.doc,.docx,.jpg,.png"
+                className="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
+
             <div className="pt-4 border-t border-slate-100">
               <Button 
                 type="submit" 
@@ -137,7 +177,7 @@ export default function TeacherUploadPage() {
                   </>
                 ) : (
                   <>
-                    <Send className="w-5 h-5" /> ส่งแผนการสอน
+                    <Send className="w-5 h-5" /> ส่งคำขอ
                   </>
                 )}
               </Button>

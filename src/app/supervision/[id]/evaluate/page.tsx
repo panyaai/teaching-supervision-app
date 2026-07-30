@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Save, Send, User, BookOpen, Calendar, Link as LinkIcon, AlertCircle, Loader2 } from 'lucide-react';
+import { Save, Send, User, BookOpen, Calendar, Link as LinkIcon, AlertCircle, Loader2, FileText } from 'lucide-react';
 import { fetchGASData, User as UserType, Category } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { useParams } from 'next/navigation';
@@ -25,6 +25,7 @@ export default function EvaluatePage() {
   const [teacherName, setTeacherName] = useState("");
   const [supervisorName, setSupervisorName] = useState("");
   const [subject, setSubject] = useState("");
+  const [planUrl, setPlanUrl] = useState("");
 
   const { user: currentUser } = useAuth();
 
@@ -51,6 +52,7 @@ export default function EvaluatePage() {
           if (record) {
             setTeacherName(record.Teacher_Name);
             setSubject(record.Subject_Name);
+            setPlanUrl(record.Plan_URL || "");
           }
         }
 
@@ -232,7 +234,18 @@ export default function EvaluatePage() {
           </div>
         </div>
 
-          {/* Removed file attachment section as requested by user */}
+        {planUrl && !planUrl.includes("Upload Failed") && (
+          <div className="mt-4 pt-4 border-t border-slate-100">
+            <a 
+              href={planUrl} 
+              target="_blank" 
+              rel="noreferrer"
+              className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium hover:bg-blue-100 transition-colors border border-blue-200"
+            >
+              <FileText className="w-4 h-4 mr-2" /> ดูไฟล์แผนการสอนที่แนบมา
+            </a>
+          </div>
+        )}
       </div>
 
       <div className="p-6">
@@ -247,16 +260,16 @@ export default function EvaluatePage() {
             <p className="text-gray-500 font-medium">กำลังโหลดหัวข้อการประเมิน...</p>
           </div>
         ) : (
-          <div className="space-y-6 sm:space-y-8">
+          <div className="space-y-3">
             {categories.filter(cat => cat.Category_ID || cat.Title).map((cat, idx) => (
-              <div key={cat.Category_ID || idx} className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors">
-                <h3 className="font-semibold text-slate-800 mb-4">{cat.Title}</h3>
-                <div className="grid grid-cols-5 gap-2 sm:gap-4">
+              <div key={cat.Category_ID || idx} className="bg-white p-3 rounded-lg border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-blue-300 transition-colors">
+                <h3 className="font-medium text-slate-800 flex-1">{cat.Title}</h3>
+                <div className="flex gap-2 flex-shrink-0">
                   {scoreOptions.map((opt) => (
                     <label key={opt.value} className={`
-                      cursor-pointer flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg border-2 transition-all text-center
-                      ${scores[cat.Category_ID] === opt.value ? opt.color : 'border-slate-100 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:border-slate-200'}
-                    `}>
+                      cursor-pointer flex items-center justify-center w-10 h-10 rounded-md border transition-all text-center
+                      ${scores[cat.Category_ID] === opt.value ? opt.color : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:border-slate-300'}
+                    `} title={opt.label}>
                       <input 
                         type="radio" 
                         name={cat.Category_ID} 
@@ -264,8 +277,7 @@ export default function EvaluatePage() {
                         className="sr-only"
                         onChange={(e) => handleScoreChange(cat.Category_ID, e.target.value)}
                       />
-                      <span className="font-bold text-base sm:text-lg mb-1">{opt.value}</span>
-                      <span className="text-[10px] sm:text-xs leading-tight">{opt.label}</span>
+                      <span className="font-bold">{opt.value}</span>
                     </label>
                   ))}
                 </div>
