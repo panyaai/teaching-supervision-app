@@ -57,8 +57,9 @@ export default function EvaluatePage() {
         }
 
         const initialScores: Record<string, string> = {};
-        cats.forEach(c => {
-          initialScores[c.Category_ID] = '';
+        cats.forEach((c, idx) => {
+          const safeId = c.Category_ID || `cat_${idx}`;
+          initialScores[safeId] = '';
         });
         setScores(initialScores);
 
@@ -261,28 +262,30 @@ export default function EvaluatePage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {categories.filter(cat => cat.Category_ID || cat.Title).map((cat, idx) => (
-              <div key={cat.Category_ID || idx} className="bg-white p-3 rounded-lg border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-blue-300 transition-colors">
+            {categories.filter(cat => cat.Category_ID || cat.Title).map((cat, idx) => {
+              const safeId = cat.Category_ID || `cat_${idx}`;
+              return (
+              <div key={safeId} className="bg-white p-3 rounded-lg border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-blue-300 transition-colors">
                 <h3 className="font-medium text-slate-800 flex-1">{cat.Title}</h3>
                 <div className="flex gap-2 flex-shrink-0">
                   {scoreOptions.map((opt) => (
                     <label key={opt.value} className={`
                       cursor-pointer flex items-center justify-center w-10 h-10 rounded-md border transition-all text-center
-                      ${scores[cat.Category_ID] === opt.value ? opt.color : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:border-slate-300'}
+                      ${scores[safeId] === opt.value ? opt.color : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:border-slate-300'}
                     `} title={opt.label}>
                       <input 
                         type="radio" 
-                        name={cat.Category_ID} 
+                        name={safeId} 
                         value={opt.value} 
                         className="sr-only"
-                        onChange={(e) => handleScoreChange(cat.Category_ID, e.target.value)}
+                        onChange={(e) => handleScoreChange(safeId, e.target.value)}
                       />
                       <span className="font-bold">{opt.value}</span>
                     </label>
                   ))}
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         )}
 
