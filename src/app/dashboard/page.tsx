@@ -6,6 +6,7 @@ import { Users, FileText, CheckCircle, TrendingUp, Loader2 } from "lucide-react"
 import { useEffect, useState } from "react";
 import { fetchGASData, SupervisionRecord, User } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
@@ -154,7 +155,7 @@ export default function DashboardPage() {
                       <td className="py-3 px-4 text-center text-slate-600">{t.mediaAvg}</td>
                       <td className="py-3 px-4 text-center text-slate-600">{t.assessAvg}</td>
                       <td className="py-3 px-4 text-center">
-                        <a 
+                        <Link 
                           href={`/report?teacher=${encodeURIComponent(t.teacher)}`}
                           target="_blank"
                           rel="noreferrer"
@@ -162,7 +163,7 @@ export default function DashboardPage() {
                           title="พิมพ์รายงาน PDF"
                         >
                           <FileText className="w-4 h-4" />
-                        </a>
+                        </Link>
                       </td>
                     </tr>
                   )) : (
