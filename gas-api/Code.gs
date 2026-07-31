@@ -130,6 +130,34 @@ function doPost(e) {
         0, 0, 0, 0 // Scores
       ];
       sheet.appendRow(row);
+      
+      // Send Telegram notification
+      try {
+        const token = "8323362385:AAEZTWH8AFcJwt3qtlu9ntiaCkOLc2GBnMo";
+        const chatId = "-5084363019";
+        const message = "📣 *มีการขอรับการนิเทศใหม่*\n" +
+                        "👨‍🏫 *ครู:* " + (data.teacherName || 'ไม่ระบุ') + "\n" +
+                        "📚 *วิชา:* " + (data.subject || 'ไม่ระบุ') + "\n" +
+                        "🏫 *ชั้น:* " + (data.gradeLevel || 'ไม่ระบุ') + "\n" +
+                        "🕒 *เวลา:* " + (data.subjectCode || 'ไม่ระบุ') + "\n" +
+                        "📎 [แผนการสอน](" + (planUrl || '-') + ")";
+                        
+        const url = "https://api.telegram.org/bot" + token + "/sendMessage";
+        const options = {
+          "method": "post",
+          "contentType": "application/json",
+          "payload": JSON.stringify({
+            "chat_id": chatId,
+            "text": message,
+            "parse_mode": "Markdown"
+          })
+        };
+        UrlFetchApp.fetch(url, options);
+      } catch (telegramError) {
+        // Ignore errors so it doesn't break the form submission
+        console.log("Telegram Error: " + telegramError.toString());
+      }
+
       return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'ส่งคำขอรับการนิเทศเรียบร้อยแล้ว' })).setMimeType(ContentService.MimeType.JSON);
       
     } else if (action === 'evaluate' || action === 'evaluate_new') {
