@@ -140,6 +140,7 @@ export default function DashboardPage() {
                     <th className="py-3 px-4 text-center">จัดกิจกรรม (เต็ม 4)</th>
                     <th className="py-3 px-4 text-center">สื่อ/นวัตกรรม (เต็ม 7)</th>
                     <th className="py-3 px-4 text-center">วัด/ประเมินผล (เต็ม 5)</th>
+                    <th className="py-3 px-4 text-center">รายงาน PDF</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -152,6 +153,17 @@ export default function DashboardPage() {
                       <td className="py-3 px-4 text-center text-slate-600">{t.actAvg}</td>
                       <td className="py-3 px-4 text-center text-slate-600">{t.mediaAvg}</td>
                       <td className="py-3 px-4 text-center text-slate-600">{t.assessAvg}</td>
+                      <td className="py-3 px-4 text-center">
+                        <a 
+                          href={`/report?teacher=${encodeURIComponent(t.teacher)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center justify-center p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                          title="พิมพ์รายงาน PDF"
+                        >
+                          <FileText className="w-4 h-4" />
+                        </a>
+                      </td>
                     </tr>
                   )) : (
                     <tr>
