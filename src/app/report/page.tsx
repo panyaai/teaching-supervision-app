@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { fetchGASData, SupervisionRecord, User } from '@/lib/api';
 import { Loader2, Printer, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
-export default function ReportPage() {
+function ReportContent() {
   const searchParams = useSearchParams();
   const teacherName = searchParams.get('teacher');
   
@@ -202,5 +202,13 @@ export default function ReportPage() {
       </div>
       
     </div>
+  );
+}
+
+export default function ReportPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-slate-500">กำลังโหลดรายงาน...</div>}>
+      <ReportContent />
+    </Suspense>
   );
 }
