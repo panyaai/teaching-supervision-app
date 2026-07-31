@@ -63,7 +63,8 @@ export default function TeacherUploadPage() {
         mimeType: mimeType
       };
 
-      let GAS_URL = process.env.NEXT_PUBLIC_GAS_URL || ''; 
+      const FALLBACK_GAS_URL = "https://script.google.com/macros/s/AKfycbzfwjjceGES37MicY-46rpPjAwGLY6OaOwTFAYztfUUfCRdvbEy0HVMjliOnArwS39G/exec";
+      let GAS_URL = process.env.NEXT_PUBLIC_GAS_URL || FALLBACK_GAS_URL; 
       if (typeof window !== "undefined") {
         const savedUrl = localStorage.getItem("gasUrl");
         if (savedUrl) GAS_URL = savedUrl;
