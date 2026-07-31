@@ -135,21 +135,22 @@ function doPost(e) {
       try {
         const token = "8323362385:AAEZTWH8AFcJwt3qtlu9ntiaCkOLc2GBnMo";
         const chatId = "-5084363019";
-        const message = "📣 *มีการขอรับการนิเทศใหม่*\n" +
-                        "👨‍🏫 *ครู:* " + (data.teacherName || 'ไม่ระบุ') + "\n" +
-                        "📚 *วิชา:* " + (data.subject || 'ไม่ระบุ') + "\n" +
-                        "🏫 *ชั้น:* " + (data.gradeLevel || 'ไม่ระบุ') + "\n" +
-                        "🕒 *เวลา:* " + (data.subjectCode || 'ไม่ระบุ') + "\n" +
-                        "📎 [แผนการสอน](" + (planUrl || '-') + ")";
+        const message = "📣 <b>มีการขอรับการนิเทศใหม่</b>\n" +
+                        "👨‍🏫 <b>ครู:</b> " + (data.teacherName || 'ไม่ระบุ') + "\n" +
+                        "📚 <b>วิชา:</b> " + (data.subject || 'ไม่ระบุ') + "\n" +
+                        "🏫 <b>ชั้น:</b> " + (data.gradeLevel || 'ไม่ระบุ') + "\n" +
+                        "🕒 <b>เวลา:</b> " + (data.subjectCode || 'ไม่ระบุ') + "\n" +
+                        "📎 <a href='" + (planUrl || '-') + "'>ลิงก์แผนการสอน</a>";
                         
         const url = "https://api.telegram.org/bot" + token + "/sendMessage";
         const options = {
           "method": "post",
           "contentType": "application/json",
+          "muteHttpExceptions": true,
           "payload": JSON.stringify({
             "chat_id": chatId,
             "text": message,
-            "parse_mode": "Markdown"
+            "parse_mode": "HTML"
           })
         };
         UrlFetchApp.fetch(url, options);
