@@ -91,7 +91,7 @@ function ReportContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 py-8 print:bg-white print:py-0">
+    <div className="min-h-screen bg-slate-100 py-8 print:bg-white print:py-0 print:m-0">
       
       {/* Controls (Hidden in Print) */}
       <div className="max-w-4xl mx-auto mb-6 flex justify-between items-center print:hidden px-4">
@@ -110,20 +110,20 @@ function ReportContent() {
       <div className="max-w-[210mm] mx-auto bg-white shadow-xl print:shadow-none print:w-full print:max-w-none rounded-xl overflow-hidden print:rounded-none">
         
         {/* Header */}
-        <div className="p-10 border-b-4 border-blue-900 bg-slate-50 print:bg-white">
+        <div className="p-8 print:p-6 border-b-4 border-blue-900 bg-slate-50 print:bg-white">
           <div className="text-center">
-            <h1 className="text-3xl font-black text-slate-900 mb-2">รายงานสรุปผลการนิเทศการสอน</h1>
-            <p className="text-lg text-slate-600 font-medium">ภาคเรียนที่ 1 ปีการศึกษา 2567</p>
+            <h1 className="text-3xl font-black text-slate-900 mb-1">รายงานสรุปผลการนิเทศการสอน</h1>
+            <p className="text-base text-slate-600 font-medium">ภาคเรียนที่ 1 ปีการศึกษา 2567</p>
           </div>
         </div>
         
         {/* Content */}
-        <div className="p-12 space-y-10">
+        <div className="p-8 print:p-6 space-y-6 print:space-y-4">
           
           {/* Teacher Profile */}
-          <div className="bg-slate-50 p-6 rounded-xl border border-slate-100">
-            <h2 className="text-xl font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2">ข้อมูลผู้รับการนิเทศ</h2>
-            <div className="grid grid-cols-2 gap-4 text-base">
+          <div className="bg-slate-50 p-5 rounded-xl border border-slate-100">
+            <h2 className="text-lg font-bold text-slate-800 mb-3 border-b border-slate-200 pb-2">ข้อมูลผู้รับการนิเทศ</h2>
+            <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <span className="text-slate-500 mr-2">ชื่อ-นามสกุล:</span>
                 <span className="font-bold text-slate-900">{teacherData.teacher}</span>
@@ -140,51 +140,51 @@ function ReportContent() {
           </div>
           
           {/* Main Score Overview */}
-          <div className="text-center">
-            <h2 className="text-lg font-bold text-slate-700 mb-4">คะแนนประเมินเฉลี่ยรวม (100 คะแนน)</h2>
-            <div className="inline-flex items-center justify-center w-40 h-40 rounded-full border-8 border-blue-100 bg-white shadow-inner">
-              <span className="text-5xl font-black text-blue-600">{teacherData.score}</span>
+          <div className="text-center py-2">
+            <h2 className="text-base font-bold text-slate-700 mb-3">คะแนนประเมินเฉลี่ยรวม (100 คะแนน)</h2>
+            <div className="inline-flex items-center justify-center w-32 h-32 rounded-full border-8 border-blue-100 bg-white shadow-inner">
+              <span className="text-4xl font-black text-blue-600">{teacherData.score}</span>
             </div>
           </div>
           
           {/* Detailed Scores */}
           <div>
-            <h2 className="text-xl font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2">สรุปคะแนนแยกรายด้าน</h2>
-            <div className="space-y-4">
+            <h2 className="text-lg font-bold text-slate-800 mb-3 border-b border-slate-200 pb-2">สรุปคะแนนแยกรายด้าน</h2>
+            <div className="space-y-3">
               
               {/* Prep */}
-              <div className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-lg shadow-sm">
-                <div className="font-semibold text-slate-700 text-lg">1. ด้านการเตรียมการสอน</div>
+              <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                <div className="font-semibold text-slate-700 text-base">1. ด้านการเตรียมการสอน</div>
                 <div className="flex items-baseline">
-                  <span className="text-2xl font-black text-slate-900">{teacherData.prepAvg}</span>
-                  <span className="text-slate-500 ml-1 font-medium">/ 4 คะแนน</span>
+                  <span className="text-xl font-black text-slate-900">{teacherData.prepAvg}</span>
+                  <span className="text-slate-500 ml-1 text-sm font-medium">/ 4 คะแนน</span>
                 </div>
               </div>
               
               {/* Activity */}
-              <div className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-lg shadow-sm">
-                <div className="font-semibold text-slate-700 text-lg">2. ด้านการจัดกิจกรรมการเรียนรู้</div>
+              <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                <div className="font-semibold text-slate-700 text-base">2. ด้านการจัดกิจกรรมการเรียนรู้</div>
                 <div className="flex items-baseline">
-                  <span className="text-2xl font-black text-slate-900">{teacherData.actAvg}</span>
-                  <span className="text-slate-500 ml-1 font-medium">/ 4 คะแนน</span>
+                  <span className="text-xl font-black text-slate-900">{teacherData.actAvg}</span>
+                  <span className="text-slate-500 ml-1 text-sm font-medium">/ 4 คะแนน</span>
                 </div>
               </div>
               
               {/* Media */}
-              <div className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-lg shadow-sm">
-                <div className="font-semibold text-slate-700 text-lg">3. ด้านการใช้สื่อและนวัตกรรม</div>
+              <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                <div className="font-semibold text-slate-700 text-base">3. ด้านการใช้สื่อและนวัตกรรม</div>
                 <div className="flex items-baseline">
-                  <span className="text-2xl font-black text-slate-900">{teacherData.mediaAvg}</span>
-                  <span className="text-slate-500 ml-1 font-medium">/ 7 คะแนน</span>
+                  <span className="text-xl font-black text-slate-900">{teacherData.mediaAvg}</span>
+                  <span className="text-slate-500 ml-1 text-sm font-medium">/ 7 คะแนน</span>
                 </div>
               </div>
               
               {/* Assessment */}
-              <div className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-lg shadow-sm">
-                <div className="font-semibold text-slate-700 text-lg">4. ด้านการวัดและประเมินผล</div>
+              <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                <div className="font-semibold text-slate-700 text-base">4. ด้านการวัดและประเมินผล</div>
                 <div className="flex items-baseline">
-                  <span className="text-2xl font-black text-slate-900">{teacherData.assessAvg}</span>
-                  <span className="text-slate-500 ml-1 font-medium">/ 5 คะแนน</span>
+                  <span className="text-xl font-black text-slate-900">{teacherData.assessAvg}</span>
+                  <span className="text-slate-500 ml-1 text-sm font-medium">/ 5 คะแนน</span>
                 </div>
               </div>
               
@@ -194,7 +194,7 @@ function ReportContent() {
         </div>
         
         {/* Footer */}
-        <div className="p-8 text-center text-sm text-slate-400 border-t border-slate-100 bg-slate-50 print:bg-white print:border-none print:pt-16">
+        <div className="p-6 text-center text-xs text-slate-400 border-t border-slate-100 bg-slate-50 print:bg-white print:border-none print:pt-4">
           <p>เอกสารสรุปผลการนิเทศการสอนออนไลน์</p>
           <p>สร้างเมื่อ {new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
