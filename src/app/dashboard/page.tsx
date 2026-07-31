@@ -13,6 +13,20 @@ export default function DashboardPage() {
   const [records, setRecords] = useState<SupervisionRecord[]>([]);
   const [users, setUsers] = useState<User[]>([]);
 
+  const [academicText, setAcademicText] = useState('ปีการศึกษา 2569 ภาคเรียนที่ 1');
+
+  useEffect(() => {
+    const updateYear = () => {
+      const term = localStorage.getItem('academicTerm') || '1';
+      const year = localStorage.getItem('academicYear') || '2569';
+      setAcademicText(`ปีการศึกษา ${year} ภาคเรียนที่ ${term}`);
+    };
+    
+    updateYear();
+    window.addEventListener('academicSettingsChanged', updateYear);
+    return () => window.removeEventListener('academicSettingsChanged', updateYear);
+  }, []);
+
   const { user } = useAuth();
   
   useEffect(() => {
@@ -98,20 +112,6 @@ export default function DashboardPage() {
   const displayChartData = teacherData.length > 0 ? teacherData : [
     { teacher: "ยังไม่มีข้อมูล", score: 0 }
   ];
-
-  const [academicText, setAcademicText] = useState('ปีการศึกษา 2569 ภาคเรียนที่ 1');
-
-  useEffect(() => {
-    const updateYear = () => {
-      const term = localStorage.getItem('academicTerm') || '1';
-      const year = localStorage.getItem('academicYear') || '2569';
-      setAcademicText(`ปีการศึกษา ${year} ภาคเรียนที่ ${term}`);
-    };
-    
-    updateYear();
-    window.addEventListener('academicSettingsChanged', updateYear);
-    return () => window.removeEventListener('academicSettingsChanged', updateYear);
-  }, []);
 
   return (
     <div className="space-y-6">
