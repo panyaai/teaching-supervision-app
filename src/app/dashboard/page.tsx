@@ -99,12 +99,26 @@ export default function DashboardPage() {
     { teacher: "ยังไม่มีข้อมูล", score: 0 }
   ];
 
+  const [academicText, setAcademicText] = useState('ปีการศึกษา 2569 ภาคเรียนที่ 1');
+
+  useEffect(() => {
+    const updateYear = () => {
+      const term = localStorage.getItem('academicTerm') || '1';
+      const year = localStorage.getItem('academicYear') || '2569';
+      setAcademicText(`ปีการศึกษา ${year} ภาคเรียนที่ ${term}`);
+    };
+    
+    updateYear();
+    window.addEventListener('academicSettingsChanged', updateYear);
+    return () => window.removeEventListener('academicSettingsChanged', updateYear);
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">ภาพรวมระบบนิเทศการสอน</h1>
-          <p className="text-gray-500 mt-1">ปีการศึกษา 2567 ภาคเรียนที่ 1</p>
+          <p className="text-gray-500 mt-1">{academicText}</p>
         </div>
       </div>
 

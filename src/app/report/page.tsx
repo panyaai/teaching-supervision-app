@@ -90,6 +90,14 @@ function ReportContent() {
     );
   }
 
+  const [academicText, setAcademicText] = useState('ภาคเรียนที่ 1 ปีการศึกษา 2569');
+
+  useEffect(() => {
+    const term = localStorage.getItem('academicTerm') || '1';
+    const year = localStorage.getItem('academicYear') || '2569';
+    setAcademicText(`ภาคเรียนที่ ${term} ปีการศึกษา ${year}`);
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-100 py-8 print:bg-white print:py-0 print:m-0">
       
@@ -113,7 +121,7 @@ function ReportContent() {
         <div className="p-8 print:p-6 border-b-4 border-blue-900 bg-slate-50 print:bg-white">
           <div className="text-center">
             <h1 className="text-3xl font-black text-slate-900 mb-1">รายงานสรุปผลการนิเทศการสอน</h1>
-            <p className="text-base text-slate-600 font-medium">ภาคเรียนที่ 1 ปีการศึกษา 2567</p>
+            <p className="text-base text-slate-600 font-medium">{academicText}</p>
           </div>
         </div>
         
