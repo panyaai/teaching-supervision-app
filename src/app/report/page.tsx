@@ -14,6 +14,14 @@ function ReportContent() {
   const [teacherData, setTeacherData] = useState<any>(null);
   const [teacherInfo, setTeacherInfo] = useState<User | null>(null);
   
+  const [academicText, setAcademicText] = useState('ภาคเรียนที่ 1 ปีการศึกษา 2569');
+
+  useEffect(() => {
+    const term = localStorage.getItem('academicTerm') || '1';
+    const year = localStorage.getItem('academicYear') || '2569';
+    setAcademicText(`ภาคเรียนที่ ${term} ปีการศึกษา ${year}`);
+  }, []);
+  
   useEffect(() => {
     async function loadData() {
       if (!teacherName) return;
@@ -89,14 +97,6 @@ function ReportContent() {
       </div>
     );
   }
-
-  const [academicText, setAcademicText] = useState('ภาคเรียนที่ 1 ปีการศึกษา 2569');
-
-  useEffect(() => {
-    const term = localStorage.getItem('academicTerm') || '1';
-    const year = localStorage.getItem('academicYear') || '2569';
-    setAcademicText(`ภาคเรียนที่ ${term} ปีการศึกษา ${year}`);
-  }, []);
 
   return (
     <div className="min-h-screen bg-slate-100 py-8 print:bg-white print:py-0 print:m-0">
