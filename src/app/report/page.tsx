@@ -125,6 +125,19 @@ function ReportContent() {
         {/* Header */}
         <div className="p-8 print:p-6 border-b-4 border-blue-900 bg-slate-50 print:bg-white">
           <div className="text-center">
+            {/* Logo */}
+            <div className="mb-4 flex justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src="/logo.png" 
+                alt="โลโก้โรงเรียน" 
+                className="w-24 h-24 object-contain" 
+                onError={(e) => { 
+                  // ซ่อนรูปถ้าหาไฟล์โลโก้ไม่พบ
+                  e.currentTarget.style.display = 'none'; 
+                }} 
+              />
+            </div>
             <h1 className="text-3xl font-black text-slate-900 mb-1">รายงานสรุปผลการนิเทศการสอน</h1>
             <p className="text-base text-slate-600 font-medium">{academicText}</p>
           </div>
@@ -204,6 +217,15 @@ function ReportContent() {
             </div>
           </div>
           
+        </div>
+        
+        {/* Signature */}
+        <div className="px-8 pb-8 pt-12 print:px-6 print:pb-6 print:pt-16 flex justify-end">
+          <div className="text-center w-64">
+            <p className="mb-16 text-slate-800">ผู้รับรองรายงาน</p>
+            <p className="font-bold text-slate-900">(นายปัญญา พรหมบุตร)</p>
+            <p className="text-sm text-slate-600">ผู้อำนวยการโรงเรียนชุมแสงชนูทิศ</p>
+          </div>
         </div>
         
         {/* Footer */}
