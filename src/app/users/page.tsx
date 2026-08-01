@@ -11,6 +11,7 @@ import { fetchGASData, User } from "@/lib/api";
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     async function loadData() {
@@ -25,6 +26,16 @@ export default function UsersPage() {
     }
     loadData();
   }, []);
+
+  const filteredUsers = users.filter(user => {
+    const term = searchTerm.toLowerCase();
+    return (
+      (user.Name && user.Name.toLowerCase().includes(term)) ||
+      (user.Email && user.Email.toLowerCase().includes(term)) ||
+      (user.User_ID && user.User_ID.toLowerCase().includes(term)) ||
+      (user.Subject_Group && user.Subject_Group.toLowerCase().includes(term))
+    );
+  });
 
   return (
     <div className="space-y-6">
@@ -48,7 +59,12 @@ export default function UsersPage() {
             <CardTitle className="text-lg">รายชื่อบุคลากรทั้งหมด ({users.length} คน)</CardTitle>
             <div className="relative w-full sm:w-72">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <Input placeholder="ค้นหาชื่อ, อีเมล..." className="pl-9" />
+              <Input 
+                placeholder="ค้นหาชื่อ, อีเมล..." 
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
           </div>
         </CardHeader>
@@ -72,7 +88,7 @@ export default function UsersPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {users.length > 0 ? users.map((user, i) => (
+                  {filteredUsers.length > 0 ? filteredUsers.map((user, i) => (
                     <TableRow key={i}>
                       <TableCell className="font-medium text-slate-500">{user.User_ID}</TableCell>
                       <TableCell className="font-bold text-slate-800">{user.Name}</TableCell>
@@ -92,7 +108,7 @@ export default function UsersPage() {
                   )) : (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-                        ไม่พบข้อมูลบุคลากรใน Google Sheets
+                        ไม่พบข้อมูลบุคลากรที่ค้นหา
                       </TableCell>
                     </TableRow>
                   )}
