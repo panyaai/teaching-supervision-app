@@ -39,6 +39,7 @@ function ReportContent() {
         
         if (teacherRecords.length > 0) {
           let sum = 0, count = 0, prep = 0, act = 0, media = 0, assess = 0;
+          let subjectList: string[] = [];
           
           teacherRecords.forEach((r: SupervisionRecord) => {
             sum += (Number(r.Total_Score) || 0);
@@ -47,10 +48,14 @@ function ReportContent() {
             media += (Number(r.Score_Media) || 0);
             assess += (Number(r.Score_Assessment) || 0);
             count += 1;
+            if (r.Subject_Name && !subjectList.includes(r.Subject_Name) && r.Subject_Name !== 'ไม่ระบุ') {
+              subjectList.push(r.Subject_Name);
+            }
           });
           
           setTeacherData({
             teacher: teacherName,
+            subject: subjectList.length > 0 ? subjectList.join(', ') : (teacherInfo?.Subject_Group || 'ไม่ระบุ'),
             score: Number((sum / count).toFixed(2)),
             evaluators: count,
             prepAvg: Number((prep / count).toFixed(2)),
@@ -137,8 +142,8 @@ function ReportContent() {
                 <span className="font-bold text-slate-900">{teacherData.teacher}</span>
               </div>
               <div>
-                <span className="text-slate-500 mr-2">กลุ่มสาระการเรียนรู้:</span>
-                <span className="font-bold text-slate-900">{teacherInfo?.Subject_Group || 'ไม่ระบุ'}</span>
+                <span className="text-slate-500 mr-2">รายวิชา:</span>
+                <span className="font-bold text-slate-900">{teacherData.subject}</span>
               </div>
               <div>
                 <span className="text-slate-500 mr-2">จำนวนกรรมการประเมิน:</span>
