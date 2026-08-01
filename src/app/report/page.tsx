@@ -129,7 +129,7 @@ function ReportContent() {
             <div className="mb-4 flex justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img 
-                src="/logo.png" 
+                src="https://cdn.jsdelivr.net/gh/panyaai/ctt/ctt.png" 
                 alt="โลโก้โรงเรียน" 
                 className="w-24 h-24 object-contain" 
                 onError={(e) => { 
