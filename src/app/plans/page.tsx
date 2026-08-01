@@ -125,18 +125,39 @@ export default function PlansPage() {
                       {expandedRow === plan.Supervision_ID && (
                         <TableRow className="bg-blue-50/50">
                           <TableCell colSpan={7} className="p-0 border-b-2 border-blue-100">
-                            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                              <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-100">
-                                <h4 className="font-semibold text-blue-800 mb-2 flex items-center">
-                                  <FileText className="w-4 h-4 mr-2" /> จุดเด่นของการสอน
-                                </h4>
-                                <p className="text-slate-600 text-sm whitespace-pre-wrap">{plan.Strengths || '-'}</p>
+                            <div className="p-6">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-100">
+                                  <h4 className="font-semibold text-blue-800 mb-2 flex items-center">
+                                    <FileText className="w-4 h-4 mr-2" /> จุดเด่นของการสอน
+                                  </h4>
+                                  <p className="text-slate-600 text-sm whitespace-pre-wrap">{plan.Strengths || '-'}</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-100">
+                                  <h4 className="font-semibold text-amber-600 mb-2 flex items-center">
+                                    <FileText className="w-4 h-4 mr-2" /> ข้อเสนอแนะเพื่อการพัฒนา
+                                  </h4>
+                                  <p className="text-slate-600 text-sm whitespace-pre-wrap">{plan.Suggestions || '-'}</p>
+                                </div>
                               </div>
-                              <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-100">
-                                <h4 className="font-semibold text-amber-600 mb-2 flex items-center">
-                                  <FileText className="w-4 h-4 mr-2" /> ข้อเสนอแนะเพื่อการพัฒนา
-                                </h4>
-                                <p className="text-slate-600 text-sm whitespace-pre-wrap">{plan.Suggestions || '-'}</p>
+                              
+                              {/* Attached File Section */}
+                              <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div>
+                                  <h4 className="font-semibold text-slate-800 mb-1 flex items-center">
+                                    <FileText className="w-4 h-4 mr-2 text-blue-600" /> ไฟล์แผนการสอนที่แนบ
+                                  </h4>
+                                  <p className="text-slate-500 text-sm">ตรวจสอบไฟล์แผนการสอนที่ถูกแนบมาในคำขอนี้</p>
+                                </div>
+                                {plan.Plan_URL && plan.Plan_URL.startsWith('http') ? (
+                                  <a href={plan.Plan_URL} target="_blank" rel="noreferrer" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors text-sm whitespace-nowrap">
+                                    <Eye className="w-4 h-4 mr-2" /> ตรวจสอบไฟล์ที่อัปโหลด
+                                  </a>
+                                ) : (
+                                  <span className="inline-flex items-center px-4 py-2 bg-slate-100 text-slate-400 rounded-lg text-sm border border-slate-200">
+                                    ไม่มีไฟล์แนบ
+                                  </span>
+                                )}
                               </div>
                             </div>
                           </TableCell>
