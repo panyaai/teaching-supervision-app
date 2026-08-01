@@ -177,8 +177,41 @@ function doPost(e) {
       const scoreMedia = cats['media'] || 0;
       const scoreAssessment = cats['assessment'] || 0;
 
+      if (action === 'evaluate' && data.supervisionId) {
+        const dataRange = sheet.getDataRange();
+        const values = dataRange.getValues();
+        let rowIndex = -1;
+        
+        for (let i = 1; i < values.length; i++) {
+          if (values[i][0] === data.supervisionId) {
+            rowIndex = i + 1; // 1-based index for getRange
+            break;
+          }
+        }
+        
+        if (rowIndex !== -1) {
+          sheet.getRange(rowIndex, 4).setValue(data.supervisorName || 'ไม่ระบุ');
+          sheet.getRange(rowIndex, 8).setValue('เสร็จสิ้น');
+          sheet.getRange(rowIndex, 9).setValue(finalScore);
+          sheet.getRange(rowIndex, 10).setValue(rating);
+          sheet.getRange(rowIndex, 11).setValue(data.strengths || '');
+          sheet.getRange(rowIndex, 12).setValue(data.suggestions || '');
+          
+          if (data.planUrl) {
+            sheet.getRange(rowIndex, 13).setValue(data.planUrl); 
+          }
+          
+          sheet.getRange(rowIndex, 14).setValue(scorePrep);
+          sheet.getRange(rowIndex, 15).setValue(scoreActivity);
+          sheet.getRange(rowIndex, 16).setValue(scoreMedia);
+          sheet.getRange(rowIndex, 17).setValue(scoreAssessment);
+          
+          return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'ประเมินและอัปเดตข้อมูลเรียบร้อยแล้ว' })).setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+
       const row = [
-        'SUP' + new Date().getTime().toString().substr(-6),
+        data.supervisionId || ('SUP' + new Date().getTime().toString().substr(-6)),
         new Date().toISOString(),
         data.teacherName || 'ไม่ระบุ',
         data.supervisorName || 'ไม่ระบุ',
@@ -190,7 +223,7 @@ function doPost(e) {
         rating,
         data.strengths || '',
         data.suggestions || '',
-        '',
+        data.planUrl || '',
         scorePrep,
         scoreActivity,
         scoreMedia,

@@ -138,6 +138,7 @@ function EvaluateForm() {
       teacherName: teacherName,
       supervisorName: supervisorName,
       subject: subject,
+      planUrl: planUrl,
       totalScore, // raw score (optional)
       percentageScore, // 100-point scale
       categoryScores: aggregatedScores, // send aggregated averages
