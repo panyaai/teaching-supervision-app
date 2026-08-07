@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { Save, Send, User, BookOpen, Calendar, Link as LinkIcon, AlertCircle, Loader2, FileText } from 'lucide-react';
 import { fetchGASData, User as UserType, Category } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense } from 'react';
+import Swal from 'sweetalert2';
 
 function EvaluateForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const id = searchParams.get('id');
   const isEvaluateMode = Boolean(id && id !== '1' && id !== 'new');
   
@@ -169,11 +171,25 @@ function EvaluateForm() {
         mode: 'no-cors'
       });
       
-      alert("บันทึกข้อมูลผลการนิเทศเรียบร้อยแล้ว");
+      await Swal.fire({
+        title: 'บันทึกสำเร็จ!',
+        text: 'ผลการประเมินของคุณถูกส่งเรียบร้อยแล้ว',
+        icon: 'success',
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#3085d6',
+        allowOutsideClick: false
+      });
+      
+      router.push('/');
       
     } catch (error) {
       console.error(error);
-      alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด!',
+        text: 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
+        icon: 'error',
+        confirmButtonText: 'ตกลง'
+      });
     } finally {
       setIsSubmitting(false);
     }
